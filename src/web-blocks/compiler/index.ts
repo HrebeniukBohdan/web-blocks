@@ -1,26 +1,17 @@
 import { Lexer } from "./Lexer";
 import { Parser } from "./Parser";
+
+
 const source = `
-    <my-comp anjg="dfgfdgfg" intr =  {{$gfggf($s,$g, 'string',.75, 0015.35, 760.67, 60)}} >
-        dfsfdf fsdfdsdfff {{ $my_text + 1}} dddasdasds
-        <span name="sdfdd1" />
-        <!-- This is my comment -->
-    </my-comp>`;
-
-const lexer = new Lexer(source);
-console.log(lexer.tokenize());
-
-
-
-const parser = new Parser(`
     <!-- This is my new component -->
         a new text yo yo yo yo
     <%wb-if myAtr={{24}} %>
-        <p>yoyoyoyyo</p>
         <%wb-for iterable={{$objects}} %>
-            <div attr={{$currentObj}}>yoyoyoyyo</div>
             <%wb-yo myAtr={{$yo}} %>
-                <div myAtr={{$yo}}>yoyoyoyyo</div>
+                <div myAtr={{$yo}} @click={{$someHandler($event, 100, true)}} @mouseUp={{$handler2(false)}}>
+                    yoyoyoyyo
+                    <div attr={{$currentObj}} bool={{true}}>yoyoyoyyo {{$yo}}</div>
+                </div>
             <%/wb-yo %>
         <%/wb-for %>
     <%/wb-if %>
@@ -41,7 +32,15 @@ const parser = new Parser(`
         hfghgfhghghghfhfhh hgfhgfh yoyoyo yoyoyyoy yyoyoyoy
         tytytryt
     <!-- This is my new component -->
-`)
+`;
+
+const lexer = new Lexer(source);
+console.log(lexer.tokenize());
+
+
+
+const parser = new Parser(source)
+
 const ast = parser.parse();
 console.log(ast);
 console.log(ast.exec());

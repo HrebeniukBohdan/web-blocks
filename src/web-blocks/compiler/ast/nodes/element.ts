@@ -1,10 +1,11 @@
-import { Attribute, Attributes, Element, Node } from "../types";
+import { Attribute, Attributes, EventBindAttribute, Element, Node, EventBindings } from "../types";
 
 export class ElementNode implements Element {
     type = 'Element';
     
     private _children: Node[] = [];
-    private _attrs: { [attrName: string]: Attribute } = {};
+    private _attrs: Attributes = {};
+    private _evBindings: EventBindings = {};
     private _name: string;
 
     constructor(name: string, public nestingLevel: number) {
@@ -23,6 +24,17 @@ export class ElementNode implements Element {
         this._attrs[attr.name] = attr;
     }
 
+    get eventBindings(): EventBindings {
+        return this._evBindings;
+    }
+
+    addEventBind(evBind: EventBindAttribute): void {
+        if (this._evBindings[evBind.name]) {
+            throw new Error(`Element node has duplicates of event bindinds "${evBind.name}"`)
+        }
+        this._evBindings[evBind.name] = evBind;
+    }
+
     addNode(child: Node): void {
         if (this._children.includes(child)) {
             throw new Error('Element node is already containing this node')
@@ -35,7 +47,7 @@ export class ElementNode implements Element {
     }
 
     exec(): string {
-        return `h("${this.name}", { ${this.evalAttrs()} }${this.evalChildren()})`;
+        return `h("${this.name}", { ${this.evalAttrs()} }, { ${this.evalEventBindings()} }${this.evalChildren()})`;
     }
 
     private spaces(step = 0): string {
@@ -56,6 +68,14 @@ export class ElementNode implements Element {
                 .keys(this._attrs)
                 .map(attrName => this._attrs[attrName])
                 .map(attr => attr.exec() as string)
+                .join(', ');
+    }
+
+    private evalEventBindings() {
+        return Object
+                .keys(this._evBindings)
+                .map(eventName => this._evBindings[eventName])
+                .map(ev => ev.exec() as string)
                 .join(', ');
     }
 }

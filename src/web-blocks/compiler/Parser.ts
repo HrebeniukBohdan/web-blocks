@@ -1,5 +1,8 @@
+import { BooleanNode } from "./ast/nodes/boolean";
 import { CommentNode } from "./ast/nodes/comment";
 import { ElementNode } from "./ast/nodes/element";
+import { EvBindAttribute } from "./ast/nodes/event-bind-attribute";
+import { EventVariableNode } from "./ast/nodes/event-variable";
 import { FunctionNode } from "./ast/nodes/function";
 import { InterpolationAttribute } from "./ast/nodes/interpolation-attribute";
 import { ModificatorNode } from "./ast/nodes/modificator";
@@ -9,7 +12,7 @@ import { StringNode } from "./ast/nodes/string";
 import { TextNode } from "./ast/nodes/text";
 import { TextAttribute } from "./ast/nodes/text-attribute";
 import { VariableNode } from "./ast/nodes/variable";
-import { Element, Node, NodeContainer, ScopedElement } from "./ast/types";
+import { Element, ExpressionNode, Node, NodeContainer, NodeContainerWithAttributes, ScopedElement } from "./ast/types";
 import { Lexer } from "./Lexer";
 import { Token } from "./Token";
 import { TokenTypeName } from "./TokenType";
@@ -23,13 +26,13 @@ export function useScopeIndex(): number {
     return scopeIndex++;
 }
 
-
 export class Parser {
     private lexer: Lexer;
     private currentTokenIndex = 0;
+    private eventBindCount = 0;
     private root: RootNode;
 
-    constructor(source: string) {
+    constructor(private source: string) {
         this.lexer = new Lexer(source);
         this.lexer.tokenize();
         this.root = new RootNode();
@@ -67,6 +70,13 @@ export class Parser {
         return this.root;
     }
 
+    private throwContentListError(): void {
+        throw new Error(
+            `Syntax error is found at position: token type "${this.currentToken.type.name}" is not expected to find while content list parsing
+            ${this.source.slice(0, this.currentToken.position) + ' !== See here (Unexpected token) ==> ' + this.source.slice(this.currentToken.position)}
+            `);
+    }
+
     /**************** Root node parsing  *****************/
     private RootNode(parentNode: RootNode): void {
         while (!this.isEOF) {
@@ -81,6 +91,11 @@ export class Parser {
             } else 
             if (this.isModificator()) {
                 this.Modificator(parentNode, parentNode);
+            } else 
+            if (this.isInterpolation()) {
+                parentNode.addNode(this.InterpolationExpression(parentNode));
+            } else {
+                this.throwContentListError();
             }
         }
     }
@@ -152,6 +167,11 @@ export class Parser {
             } else 
             if (this.isModificator()) {
                 this.Modificator(parentNode, scope);
+            } else 
+            if (this.isInterpolation()) {
+                parentNode.addNode(this.InterpolationExpression(scope));
+            } else {
+                this.throwContentListError();
             }
         }
     }
@@ -161,8 +181,8 @@ export class Parser {
             parentNode.nestingLevel + 1
         );
 
-        if (this.isAttribute()) {
-            this.AttributeList(node, scope);
+        if (this.isAttribute() || this.isEventBind()) {
+            this.MixedAttributeList(node, scope);
         }
         if (this.isOpenTagClosed()) {
             this.consumeToken('OPEN_TAG_CLOSE_SIGN');
@@ -209,6 +229,25 @@ export class Parser {
         parentNode.addNode(new CommentNode(commentValue.trim()));
     }
 
+    /********* Boolean parsing block **********/
+    private isBoolean(): boolean {
+        return this.currentTokenType === 'TRUE' || this.currentTokenType === 'FALSE';
+    }
+
+    private Boolean(): BooleanNode {
+        let booleanNode: BooleanNode;
+
+        if (this.currentTokenType === 'TRUE') {
+            this.consumeToken('TRUE');
+            booleanNode = new BooleanNode('true');
+        } else {
+            this.consumeToken('FALSE');
+            booleanNode = new BooleanNode('false');
+        }
+
+        return booleanNode;
+    }
+
     /********* Interpolation expression parsing block **********/
     private isInterpolation(): boolean {
         return this.currentTokenType === 'INTERPOLATION_START';
@@ -224,6 +263,10 @@ export class Parser {
 
     private isIdentifier(): boolean {
         return this.currentTokenType === 'ID';
+    }
+
+    private isEvent(): boolean {
+        return this.currentTokenType === 'EVENT';
     }
 
     private isParenL(): boolean {
@@ -243,6 +286,9 @@ export class Parser {
 
         if (this.isNumber()) {
             node = new NumberNode(this.consumeToken('NUMBER').value);
+        } else
+        if (this.isBoolean()) {
+            node = this.Boolean();
         } else 
         if (this.isString()) {
             node = new StringNode(this.consumeToken('STRING').value);
@@ -274,9 +320,57 @@ export class Parser {
         return funcNode;
     }
 
-    private InterpolationExpression(scope: ScopedElement): StringNode|NumberNode|VariableNode|FunctionNode {
-        let expression: StringNode|NumberNode|VariableNode|FunctionNode;
+    private EventParameterExpression(scope: ScopedElement): Node {
+        let node: Node;
+
+        if (this.isNumber()) {
+            node = new NumberNode(this.consumeToken('NUMBER').value);
+        } else
+        if (this.isBoolean()) {
+            node = this.Boolean();
+        } else 
+        if (this.isString()) {
+            node = new StringNode(this.consumeToken('STRING').value);
+        } else 
+        if (this.isIdentifier()) {
+            node = new VariableNode(this.consumeToken('ID').value, scope);
+        } else 
+        if (this.isEvent()) {
+            node = new EventVariableNode(this.consumeToken('EVENT').value);
+        } else {
+            throw new Error('Expected to parse either StringLiteral, NumberLiteral or Variable');
+        }
+
+        if (this.isComma()) {
+            this.consumeToken('COMMA');
+        }
+
+        return node;
+    }
+    private EventFunctionExpression(functionName: string, scope: ScopedElement): FunctionNode {
+        const funcNode = new FunctionNode(functionName);
+        this.consumeToken('PAREN_L');
+
+        while (!this.isParenR()) {
+            funcNode.addNode(
+                this.EventParameterExpression(scope)
+            );
+        }
+
+        this.consumeToken('PAREN_R');
+
+        return funcNode;
+    }
+
+    private InterpolationExpression(scope: ScopedElement): ExpressionNode {
+        let expression: ExpressionNode;
         this.consumeToken('INTERPOLATION_START');
+
+        if (this.isBoolean()) {
+            expression = this.Boolean();
+            this.consumeToken('INTERPOLATION_END');
+            return expression;
+        }
 
         if (this.isString()) {
             expression = new StringNode(this.consumeToken('STRING').value);
@@ -306,6 +400,40 @@ export class Parser {
         return expression;
     }
 
+    /********* EventBind parsing block **********/
+    private isEventBind(): boolean {
+        return this.currentTokenType === 'EVENT_BIND';
+    }
+    private EventBind(node: Element, scope: ScopedElement): void {
+        const eventName = this.consumeToken('EVENT_BIND').value;
+
+        if (this.isInterpolation()) {
+            this.consumeToken('INTERPOLATION_START');
+            const idName = this.consumeToken('ID');
+            const eventBind = new EvBindAttribute(eventName, this.eventBindCount, this.EventFunctionExpression(idName.value, scope));
+            this.eventBindCount++;
+
+            node.addEventBind(eventBind);
+            this.root.addEventBind(eventBind);
+
+            this.consumeToken('INTERPOLATION_END');
+        } else {
+            throw new Error(
+                `Unexpected token: "${this.currentToken.type}";
+                    Expected tokens: [{{ functionCallExpression }}].`
+            );
+        }
+    }
+    private MixedAttributeList(node: Element, scope: ScopedElement): void {
+        while (this.isAttribute() || this.isEventBind()) {
+            if (this.isAttribute()) {
+                this.Attribute(node, scope);
+            } else {
+                this.EventBind(node, scope);
+            }
+        }
+    }
+
     /********* Attribute parsing block **********/
     private isString(): boolean {
         return this.currentTokenType === 'STRING';
@@ -313,7 +441,7 @@ export class Parser {
     private isAttribute(): boolean {
         return this.currentTokenType === 'ATTRIBUTE';
     }
-    private Attribute(node: Element, scope: ScopedElement): void {
+    private Attribute(node: NodeContainerWithAttributes, scope: ScopedElement): void {
         const attrName = this.consumeToken('ATTRIBUTE').value;
 
         if (this.isString()) {
@@ -331,7 +459,7 @@ export class Parser {
             );
         }
     }
-    private AttributeList(node: Element, scope: ScopedElement): void {
+    private AttributeList(node: NodeContainerWithAttributes, scope: ScopedElement): void {
         while (this.isAttribute()) {
             this.Attribute(node, scope);
         }

@@ -1,7 +1,7 @@
 import { useScopeIndex } from "./../../Parser";
-import { Attribute, Attributes, Element, Node, ScopedElement } from "../types";
+import { Attribute, Attributes, NodeContainerWithAttributes, Node, ScopedElement } from "../types";
 
-export class ModificatorNode implements Element, ScopedElement {
+export class ModificatorNode implements NodeContainerWithAttributes, ScopedElement {
     type = 'Modificator';
     private _children: Node[] = [];
     private _attrs: Attributes = {};

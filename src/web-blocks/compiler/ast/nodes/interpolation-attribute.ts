@@ -1,13 +1,9 @@
-import { Attribute } from "../types";
-import { FunctionNode } from "./function";
-import { NumberNode } from "./number";
-import { StringNode } from "./string";
-import { VariableNode } from "./variable";
+import { Attribute, ExpressionNode } from "../types";
 
 export class InterpolationAttribute implements Attribute {
     type = 'InterpolationAttribute';
 
-    constructor(private _name: string, private interpolNode: StringNode|NumberNode|VariableNode|FunctionNode) {}
+    constructor(private _name: string, private interpolNode: ExpressionNode) {}
     
     get name(): string {
         return this._name;

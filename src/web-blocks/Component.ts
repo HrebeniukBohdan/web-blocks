@@ -7,13 +7,16 @@ import { injectDependency, registerDependency } from "./di/di";
 import { HTTPService } from "./services";
 import { DataService } from "./serv1";
 import { ConstructorClass } from "./core/types";
-import { wbIf } from "./directives";
 import { wbModule } from "./core/module";
 import { Modificator } from "./modificator/decorator";
 import { WebBlockTemplate } from "./core";
 
 export interface Props {
     [propName: string]: any;
+}
+
+export interface Signals {
+    [signalName: string]: SignalType;
 }
 
 
@@ -30,6 +33,7 @@ type WbComponentType = ConstructorClass & Injectable & {
     ωß_COMPONENT_NAME: string;
     ωß_PROP_NAMES: string[];
     ωß_STATE_NAMES: string[];
+    ωß_SIGNAL_NAMES: string[];
     ωß_Template: (s: any) => VNodeChildren;
 };
 
@@ -92,6 +96,29 @@ export function Inject(ref: ForwardedType) {
     }
 }
 
+export interface SignalType<T = undefined> {
+    (payload?: T): void
+}
+
+export function Signal(target: any, propertyKey: string): void {
+    if (target.constructor['ωß_SIGNAL_NAMES'] === undefined) {
+        target.constructor['ωß_SIGNAL_NAMES'] = [];
+    }
+    const SIGNAL_NAMES = target.constructor['ωß_SIGNAL_NAMES'] as string[];
+    SIGNAL_NAMES.push(propertyKey);
+
+    target[`ωß_signal_${propertyKey}`] = (): void => { return undefined };
+    const getter = function() {
+        return this[`ωß_signal_${propertyKey}`];
+    };
+
+    if (delete target[propertyKey]) {
+        Object.defineProperty(target, propertyKey, {
+            get: getter
+        });
+    }
+}
+
 export function Prop(target: any, propertyKey: string): void {
     if (target.constructor['ωß_PROP_NAMES'] === undefined) {
         target.constructor['ωß_PROP_NAMES'] = [];
@@ -124,12 +151,12 @@ export function State(target: any, propertyKey: string): void {
     }
 }
 
-export const RenderComp = (componentType: ConstructorClass, props?: Props): VNode => {
+export const RenderComp = (componentType: ConstructorClass, props?: Props, signals?: Signals): VNode => {
     const [component] = useComponent(
         (remove: () => void) => new ComponentController(componentType as any, remove)
     );
 
-    return component.ωß_render(props);
+    return component.ωß_render(props, signals);
 }
 export const wb = RenderComp;
 
@@ -147,6 +174,7 @@ export class ComponentController {
     private ωß_COMPONENT_NAME: string;
     private ωß_PROP_NAMES: string[];
     private ωß_STATE_NAMES: string[];
+    private ωß_SIGNAL_NAMES: string[];
     private ωß_cachedVNode: VNode;
     private ωß_prevProps: Props;
     private ωß_state: Props;
@@ -157,6 +185,7 @@ export class ComponentController {
         this.ωß_COMPONENT_NAME = type.ωß_COMPONENT_NAME;
         this.ωß_PROP_NAMES = type.ωß_PROP_NAMES||[];
         this.ωß_STATE_NAMES = type.ωß_STATE_NAMES||[];
+        this.ωß_SIGNAL_NAMES = type.ωß_SIGNAL_NAMES||[];
         this.ωß_renderTemplate = type.ωß_Template;
         // Add DI here
         this.ωß = injectDependency(type as any);
@@ -174,7 +203,17 @@ export class ComponentController {
         this.ωß_componentDestroyHook();
     }
 
-    ωß_render(props?: Props): VNode {
+    ωß_render(props?: Props, signals?: Signals): VNode {
+        // signals update
+        if (signals) {
+            for (const [signalName, signalFunc] of Object.entries(signals)) {
+                if (this.ωß_SIGNAL_NAMES.includes(signalName)) {
+                    const signalContext: any = this.ωß;
+                    signalContext[`ωß_signal_${signalName}`] = signalFunc;
+                }
+            }
+        }
+
         // compare props and update
         let changed = false;
         if (this.ωß_prevProps) {
@@ -335,7 +374,7 @@ export class RootComponent {
     }
 }*/
 
-@WebBlock({
+/*@WebBlock({
     selector: 'root-component',
     template: (s: RootComponent) => h(
         'div', 
@@ -356,10 +395,25 @@ export class RootComponent {
             wb(ModComponent, { show: s.showHide, list: s.list })
         ]
     )
+})*/
+@WebBlockTemplate({
+    selector: 'root-component',
+    template: `
+        <div @mouseleave={{$onMouseMove($$event)}}>
+            <button @click={{$onButtonClick()}}>{{$showBtnLabel()}}</button>
+            <button @click={{$onAddClick()}}>Add element</button>
+            <button @click={{$onRemoveClick()}}>Remove element</button>
+            <wb-mod-component show={{$showHide}} list={{$list}} @message={{$onMessage($$event)}} />
+        </div>
+    `
 })
 export class RootComponent {
     @State showHide = false;
     @State list = [1, 2, 3, 4, 5];
+
+    onMouseMove(event: Event): void {
+        console.log(event);
+    }
 
     onButtonClick(): void {
         this.showHide = !this.showHide;
@@ -375,6 +429,10 @@ export class RootComponent {
         this.list = this.list.slice(0, this.list.length - 1);
     }
 
+    showBtnLabel(): string {
+        return this.showHide ? 'Hide' : 'Show';
+    }
+
     wbInit(): void {
         console.log('root-component init');
     }
@@ -386,37 +444,43 @@ export class RootComponent {
     wbDestroy(): void {
         console.log('root-component view destroy');
     }
+
+    onMessage(msg?: string): void {
+        console.log('yo');
+        console.log(msg);
+    }
 }
 
 @WebBlockTemplate({
     selector: 'mod-component',
     template: `
-        <div>
+        <div style="font-size: 16px;">
             Yo nigga
-            <div class={{$redClass}}>
+            <div class='redClass'>
                 Second block
                 <%wb-if condition={{$show}}%>
                     <div>
-                        <div class={{$greenClass}}>Green block</div>
+                        <div class="greenClass">Green block</div>
                         <div>One more block</div>
                         <ol>
                             <%wb-for iterable={{$list}}%>
-                                <li>item of the list</li>
+                                <li>item of the list №{{$transformIndex($index)}}</li>
                             <%/wb-for%>
                         </ol>
                     </div>
                 <%/wb-if%>
             </div>
         </div>
+        <button @click={{$onButtonClick()}}>Send message from Mod-component</button>
     `
 })
 export class ModComponent {
     @State name = 'My super component';
-    @State redClass = { redClass: true };
-    @State greenClass = { greenClass: true };
 
     @Prop list: number[];
     @Prop show: boolean;
+
+    @Signal message: SignalType<number>;
 
     constructor(private http: HTTPService) {
         // yo
@@ -428,5 +492,14 @@ export class ModComponent {
 
     wbViewInit(): void {
         console.log('mod-comp view init');
+    }
+
+    transformIndex(index: number): number {
+        return index + 1;
+    }
+
+    onButtonClick(): void {
+        // call message
+        this.message(this.list.length);
     }
 }

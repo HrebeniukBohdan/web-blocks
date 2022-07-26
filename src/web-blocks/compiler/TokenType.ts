@@ -1,5 +1,5 @@
-export type TokenTypeName = 'COMMENT'|'OPEN_TAG'|'CLOSE_TAG'|'ATTRIBUTE'|'STRING'|'OPEN_MODIFICATOR_TAG'|'CLOSE_MODIFICATOR_TAG'|'OPEN_MODIFICATOR_TAG_CLOSE_SIGN'
-                |'SELF_CLOSE_TAG_SIGN'|'OPEN_TAG_CLOSE_SIGN'|'TEXT'|'INTERPOLATION_START'|'INTERPOLATION_END'|'ID'|'PAREN_L'|'PAREN_R'|'COMMA'|'NUMBER';
+export type TokenTypeName = 'COMMENT'|'OPEN_TAG'|'CLOSE_TAG'|'EVENT'|'EVENT_BIND'|'ATTRIBUTE'|'STRING'|'OPEN_MODIFICATOR_TAG'|'CLOSE_MODIFICATOR_TAG'|'OPEN_MODIFICATOR_TAG_CLOSE_SIGN'
+                |'SELF_CLOSE_TAG_SIGN'|'OPEN_TAG_CLOSE_SIGN'|'TEXT'|'TRUE'|'FALSE'|'INTERPOLATION_START'|'INTERPOLATION_END'|'ID'|'PAREN_L'|'PAREN_R'|'COMMA'|'NUMBER';
 export class TokenType {
     constructor(public name: TokenTypeName, public regex: string) {}
 }
@@ -31,6 +31,11 @@ export const tokenTypeList: TokenType[] = [
     // <\/([a-zA-Z][a-zA-Z0-9\-]*)>
     new TokenType('CLOSE_TAG', '\\s*<\\/\\s*([a-zA-Z][a-zA-Z0-9\\-]*)\\s*>\\s*'),
 
+    // Event Bind Definition
+    // Value = Event Name
+    // \s+@([a-zA-Z][a-zA-Z0-9\\-]+)\s*=\s*
+    new TokenType('EVENT_BIND', '\\s+@([a-zA-Z][a-zA-Z0-9\\-]+)\\s*=\\s*'),
+
     // Attribute Definition
     // Value = Attribute Name
     // \s+([a-zA-Z][a-zA-Z0-9\-]+)\s*=\s*
@@ -51,9 +56,12 @@ export const tokenTypeList: TokenType[] = [
     // \s*(>)\s*
     new TokenType('OPEN_TAG_CLOSE_SIGN', '\\s*(>)\\s*'),
 
+    new TokenType('EVENT', '\\s*\\$\\$event'),
     new TokenType('INTERPOLATION_START', '{{'),
     new TokenType('INTERPOLATION_END', '}}'),
     new TokenType('ID', '\\s*\\$([a-zA-Z][a-zA-Z0-9\\_]*)'),
+    new TokenType('TRUE', '\\s*true\\s*'),
+    new TokenType('FALSE', '\\s*false\\s*'),
     new TokenType('PAREN_L', '\\s*\\('),
     new TokenType('PAREN_R', '\\s*\\)\\s*'),
     new TokenType('COMMA', '\\s*,\\s*'),
