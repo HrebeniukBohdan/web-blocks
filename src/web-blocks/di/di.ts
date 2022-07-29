@@ -1,4 +1,4 @@
-import { ForwardedType } from "../core/utils";
+import { ForwardedType } from "./decorator";
 
 export interface InjectableType {
     ωß_INJECT: Array<InjectableType|ForwardedType>;

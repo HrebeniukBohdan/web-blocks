@@ -1,5 +1,4 @@
-import { Service } from "./Component";
-// import { HTTPService } from "./services";
+import { Service } from "../web-blocks/core";
 
 @Service()
 export class DataService {

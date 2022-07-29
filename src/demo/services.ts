@@ -1,7 +1,6 @@
-import { Inject, Service } from "./Component";
+import { Service } from "../web-blocks/core";
+import { Inject, forwardRef } from "../web-blocks/di";
 import { DataService } from "./serv1";
-import { forwardRef } from "./core/utils";
-
 
 @Service()
 export class HTTPService {

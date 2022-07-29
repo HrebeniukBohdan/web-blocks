@@ -1,4 +1,4 @@
 import { RootComponent } from './Component';
-import { runEngine } from "./core/engine";
+import { runEngine } from "../web-blocks/core";
 
 runEngine("root", RootComponent);

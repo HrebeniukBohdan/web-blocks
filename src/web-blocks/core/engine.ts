@@ -1,15 +1,12 @@
-import { wb } from '../Component';
 import { ConstructorClass } from './types'; 
 import {
     init,
     attributesModule,
-    classModule,
-    propsModule,
-    styleModule,
     eventListenersModule,
     VNode,
 } from 'snabbdom/build';
 import { removeDestroyedComponents, resetComponentIndex } from './useComponent';
+import { RenderComp } from './render';
   
   const patch = init([
     // Init patch function with chosen modules
@@ -51,7 +48,7 @@ class WbEngine {
         if (this.isStateChanged()) {
             console.log('Render is done!');
             // render
-            const node = wb(this.rootComponent, {});
+            const node = RenderComp(this.rootComponent, {});
             resetComponentIndex();
             patch(this.prevNode, node);
             removeDestroyedComponents();
