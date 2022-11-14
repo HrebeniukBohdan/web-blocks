@@ -10,5 +10,5 @@ export interface IScope extends KeyValueMap {
 export type ModificatorRenderContentFunc = () => VNode|null;
 
 export interface IModificator {
-    (renderFunction: ModificatorRenderContentFunc, props: ModificatorProps, scope: IScope): VNodeChildren|VNode|null
+    modify(renderFunction: ModificatorRenderContentFunc, props: ModificatorProps, scope: IScope): VNodeChildren|VNode|null
 }

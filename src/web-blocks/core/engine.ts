@@ -1,4 +1,4 @@
-import { ConstructorClass } from './types'; 
+import { ConstructorClass, IModule } from './types'; 
 import {
     init,
     attributesModule,
@@ -46,7 +46,7 @@ class WbEngine {
 
     private render() {
         if (this.isStateChanged()) {
-            console.log('Render is done!');
+            console.log('Render is started!');
             // render
             const node = RenderComp(this.rootComponent, {});
             resetComponentIndex();
@@ -54,6 +54,7 @@ class WbEngine {
             removeDestroyedComponents();
             this.prevNode = node;
             this.resetStateChanged();
+            console.log('Render is done!');
         }
     }
 
@@ -74,6 +75,15 @@ export function runEngine(rootNodeName: string, rootComponent: ConstructorClass)
     }
 
     engine = new WbEngine(rootNodeName, rootComponent);
+    engine.run();
+}
+
+export function runModule(rootNodeName: string, module: ConstructorClass): void {
+    if (engine) {
+        throw new Error('The web-blocks engine is already running.');
+    }
+
+    engine = new WbEngine(rootNodeName, (module as IModule).ωß_root);
     engine.run();
 }
 

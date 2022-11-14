@@ -1,6 +1,7 @@
+import { injectDependency } from './../di/di';
 import { VNodeChildren, VNode } from 'snabbdom/build';
 import { wbModule } from '../core/module';
-import { IScope, ModificatorProps, ModificatorRenderContentFunc } from "./types";
+import { IModificator, IScope, ModificatorProps, ModificatorRenderContentFunc } from "./types";
 
 export function getScopeProp(key: string, scope: IScope): unknown {
     let currentScope = scope;
@@ -32,8 +33,10 @@ export function renderModificator(
     props: ModificatorProps,
     renderFunc: ModificatorRenderContentFunc
 ): VNodeChildren|VNode|null {
-    const modificator = wbModule.getModificator(name);
-    return modificator(renderFunc, props, scope);
+    const modificatorClass = wbModule.getModificator(name);
+    const modInstance: IModificator = injectDependency(modificatorClass as any);
+
+    return modInstance.modify(renderFunc, props, scope);
 }
 
 export function flattenArray(array: unknown[]): unknown[] {

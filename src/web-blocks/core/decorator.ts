@@ -1,4 +1,4 @@
-import { Injectable } from './types';
+import { IModule, Injectable } from './types';
 import { VNodeChildren } from 'snabbdom/build';
 import { registerDependency } from "../di/di";
 import { createScope, flattenArray, getScopeProp, renderModificator } from "./../modificator";
@@ -18,8 +18,24 @@ const g = getScopeProp;
 type H = typeof renderWebBlock;
 type ManualRenderTemplateFunc = (ctx: unknown, h: H) => VNodeChildren;
 
-function patchForwardRefs(clazz: Injectable): void {
+export function patchForwardRefs(clazz: Injectable): void {
     clazz.ωß_FORWARD_REFS?.forEach(r => clazz.ωß_INJECT[r.index] = r.ref);
+}
+
+export function WbModule<TClass extends ConstructorClass>(params: {
+    root: ConstructorClass,
+    blocks?: ConstructorClass[],
+    modificators?: ConstructorClass[],
+    services?: ConstructorClass[]
+}): (target: TClass) => IModule {
+    return function (target: TClass): IModule {
+        const t: any = target;
+        t.ωß_root = params.root;
+        t.ωß_blocks = params.blocks;
+        t.ωß_modificators = params.modificators;
+        t.ωß_services = params.services;
+        return <IModule>t;
+    };
 }
 
 export function WebBlock<TClass extends ConstructorClass>(params: {

@@ -32,6 +32,15 @@ export type WbComponentType = ConstructorClass & Injectable & {
     ωß_Template: (s: any) => VNodeChildren;
 };
 
+export interface IModule {
+    ωß_root: ConstructorClass;
+    ωß_blocks?: ConstructorClass[];
+    ωß_modificators?: ConstructorClass[];
+    ωß_services?: ConstructorClass[];
+
+    new(): any; 
+}
+
 /** WebBlock hooks interfaces **/
 export interface WbInit {
     wbInit: () => void;

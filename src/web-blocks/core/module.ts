@@ -1,9 +1,8 @@
-import { IModificator } from "../modificator";
 import { ConstructorClass } from "./types";
 
 class WbGlobalModule {
     private components: Map<string, ConstructorClass> = new Map();
-    private modificators: Map<string, IModificator> = new Map();
+    private modificators: Map<string, ConstructorClass> = new Map();
     private filters: Map<string, ConstructorClass> = new Map();
 
     registerComponent(name: string, compClass: ConstructorClass): void {
@@ -22,7 +21,7 @@ class WbGlobalModule {
         return this.components.get(name);
     }
 
-    registerModificator(name: string, modFunc: IModificator): void {
+    registerModificator(name: string, modFunc: ConstructorClass): void {
         if (this.isEntityRegistered(name, 'M')) {
             throw new Error(`The modificator with the name "${name} already exists"`);
         }
@@ -30,7 +29,7 @@ class WbGlobalModule {
         this.modificators.set(name, modFunc);
     }
 
-    getModificator(name: string): IModificator {
+    getModificator(name: string): ConstructorClass {
         if (!this.isEntityRegistered(name, 'M')) {
             throw new Error(`The modificator with the name "${name} has not registered"`);
         }

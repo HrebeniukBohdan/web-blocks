@@ -211,6 +211,9 @@ export class RootComponent {
                         </ol>
                     </div>
                 <%/wb-if%>
+                <%wb-nothing some={{$show}}%>
+                    Third
+                <%/wb-nothing%>
             </div>
         </div>
         <button @click={{$onButtonClick()}}>Send message from Mod-component</button>

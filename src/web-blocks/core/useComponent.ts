@@ -5,11 +5,18 @@ let posIndex = 0;
 export type ComponentFactory<T> = (destroyComponent: () => void) => T;
 
 export const useComponent = <T>(componentFactory: ComponentFactory<T>): [T, () => void] => {
+    console.log(`use component = ${posIndex}`);
     const currentPosIndex = posIndex;
     const component = componentStack[currentPosIndex];
     posIndex++;
 
     const removeComponent = () => { componentsToDestroy.push(currentPosIndex) };
+
+    if (component) {
+        console.log('exist');
+    } else {
+        console.log('created');
+    }
 
     if (component === undefined) {
         componentStack[currentPosIndex] = componentFactory(removeComponent);

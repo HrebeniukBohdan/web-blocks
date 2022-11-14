@@ -41,6 +41,7 @@ export class ComponentController {
     }
 
     private ωß_destroy(vNode: VNode): void {
+        console.log('Component to destroy!');
         this.ωß.wbDestroy && this.ωß.wbDestroy();
         this.ωß = null;
         this.ωß_componentDestroyHook();

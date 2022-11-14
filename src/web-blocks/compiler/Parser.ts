@@ -155,6 +155,7 @@ export class Parser {
     }
     private ContentList(parentNode: NodeContainer, scope: ScopedElement, modificator = false): void {
         const isEnd = modificator ? this.isModificatorEnd.bind(this) : this.isElementEnd.bind(this);
+        
         while (!isEnd()) {
             if (this.isComment()) {
                 this.Comment(parentNode);
