@@ -30,7 +30,7 @@ export class RootNode implements NodeContainer, ScopedElement {
 
     exec(): string {
         const args1Source = ' var h = arguments[0];\n var m = arguments[1];\n var s = arguments[2];\n var g = arguments[3];\n';
-        const args2Source = ' var a = arguments[4];\n var ctx = arguments[5];\n var sl = [ctx];\n\n';
+        const args2Source = ' var a = arguments[4];\n var l = arguments[5];\n var ctx = arguments[6];\n var sl = [ctx];\n\n';
         const eventBindings = this.evalEventBindings();
         const nodeSource = ' return a([\n' 
             + this.children.map(node => '   ' + node.exec() as string).join(',\n')

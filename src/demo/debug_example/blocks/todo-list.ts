@@ -4,17 +4,10 @@ import { TodoTaskData } from '../types';
 @WebBlock({
     selector: 'todo-list',
     template: `
-        <div class="header">
-            <h2>My To Do List</h2>
-            <input type="text" placeholder="Title..." value={{$textValue}} @change={{$onTextChange($$event)}} />
-            <span @click={{$newElement()}} class="addBtn">Add</span>
-        </div>
-
         <ul>
             <%wb-for iterable={{$sortedTasks()}} trackBy='id' %>
                 <wb-todo-item 
                     data={{$current}}
-                    @close={{$removeTask($$event)}}
                     @statusChange={{$changeItemStatus($$event)}}
                 />
             <%/wb-for%>
@@ -29,9 +22,6 @@ export class TodoList implements WbInit {
         { id: 3, text: '4. Buy eggs', done: false },
         { id: 4, text: '5. Make your own Angular', done: true }
     ];
-    @State textValue = 'yo';
-
-    currentId = 5;
 
     wbInit(): void {
         console.log(this);
@@ -40,27 +30,6 @@ export class TodoList implements WbInit {
     wbChange(): void {
         console.log('wb change list');
         console.log(this.tasks);
-    }
-
-    onTextChange(event: any): void {
-        console.log(event);
-        this.textValue = event.target.value;
-    }
-
-    newElement(): void {
-        if (this.textValue) {
-            this.tasks = [
-                ...this.tasks,
-                {
-                    id: this.currentId,
-                    text: this.textValue,
-                    done: false
-                }
-            ];
-
-            this.currentId++;
-            this.textValue = '';
-        }
     }
 
     sortedTasks(): TodoTaskData[] {
@@ -74,13 +43,9 @@ export class TodoList implements WbInit {
         return array;
     }
 
-    removeTask(id: number): void {
-        this.tasks = this.tasks.filter(task => task.id !== id);
-    }
-
-    changeItemStatus(id: number): void {
-        console.log('Clicked on = ' + (id + 1));
-        const taskIndex = this.tasks.findIndex(task => task.id === id);
+    changeItemStatus(taskData: TodoTaskData): void {
+        console.log('Clicked on = ' + (taskData.id + 1));
+        const taskIndex = this.tasks.findIndex(task => task.id === taskData.id);
         const task = this.tasks[taskIndex];
         this.tasks = Object.assign(
             [] as TodoTaskData[],

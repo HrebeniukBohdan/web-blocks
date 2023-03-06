@@ -1,12 +1,11 @@
+import { VDomNodeChildren } from './../vdom/h';
 import { IModule, Injectable } from './types';
-import { VNodeChildren } from 'snabbdom/build';
 import { registerDependency } from "../di/di";
 import { createScope, flattenArray, getScopeProp, renderModificator } from "./../modificator";
 import { wbModule } from "./module";
 import { ConstructorClass } from "./types";
-import { compileTemplate } from "./compile";
+import { compileTemplate, L } from "./compile";
 import { renderWebBlock } from "./render";
-import { markStateChanged } from './engine';
 import 'reflect-metadata';
 
 const h = renderWebBlock;
@@ -16,7 +15,7 @@ const s = createScope;
 const g = getScopeProp;
 
 type H = typeof renderWebBlock;
-type ManualRenderTemplateFunc = (ctx: unknown, h: H) => VNodeChildren;
+type ManualRenderTemplateFunc = (ctx: unknown, h: H) => VDomNodeChildren;
 
 export function patchForwardRefs(clazz: Injectable): void {
     clazz.ωß_FORWARD_REFS?.forEach(r => clazz.ωß_INJECT[r.index] = r.ref);
@@ -51,7 +50,7 @@ export function WebBlock<TClass extends ConstructorClass>(params: {
 
         if (typeof params.template === 'string') {
             const renderTemplate = compileTemplate(params.template);
-            t.ωß_Template = (ctx: unknown) => renderTemplate(h, m, s, g, a, ctx);
+            t.ωß_Template = (ctx: unknown, l: L) => renderTemplate(h, m, s, g, a, l, ctx);
         } else 
         if (typeof params.template === 'function') {
             const renderTemplate = params.template;
@@ -62,7 +61,7 @@ export function WebBlock<TClass extends ConstructorClass>(params: {
 
         patchForwardRefs(t);
         registerDependency(t, false);
-        wbModule.registerComponent(componentName, t);
+        wbModule.registerComponentFactory(componentName, t);
 
         return <TClass>target;
     };
@@ -145,7 +144,9 @@ export function State(target: any, propertyKey: string): void {
     };
     const setter = function(newVal: unknown) {
         this[`ωß_${propertyKey}`] = newVal;
-        markStateChanged();
+        const updateStateHook: () => void = this[`ωß_$$updateState$$`];
+        updateStateHook && updateStateHook();
+        //markStateChanged();
     };
 
     if (delete target[propertyKey]) {

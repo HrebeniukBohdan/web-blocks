@@ -42,7 +42,7 @@
     "webpack-merge": "^5.3.0"
   },
   "scripts": {
-    "start": "cross-env NODE_ENV=development webpack serve",
+    "start": "cross-env NODE_ENV=development webpack serve --port 5015",
     "coverage": "jest --collect-coverage",
     "test": "jest --watchAll",
     "build": "cross-env NODE_ENV=production webpack"

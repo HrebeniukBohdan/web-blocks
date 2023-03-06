@@ -1,5 +1,5 @@
+import { VDomNodeChildren } from './../vdom/h';
 import { Compiler } from '../compiler/Compiler';
-import { VNodeChildren } from "snabbdom/build";
 import { createScope, flattenArray, getScopeProp, renderModificator } from "./../modificator";
 import { renderWebBlock } from "./render";
 
@@ -10,7 +10,8 @@ type M = typeof renderModificator;
 type A = typeof flattenArray;
 type S = typeof createScope;
 type G = typeof getScopeProp;
-type RenderTemplateFunc = (h: H, m: M, s: S, g: G, a: A, ctx: unknown) => VNodeChildren;
+export type L = <F extends (...args: unknown[]) => unknown>(f: F) => F;
+type RenderTemplateFunc = (h: H, m: M, s: S, g: G, a: A, l: L, ctx: unknown) => VDomNodeChildren;
 
 export function compileTemplate(templateSource: string): RenderTemplateFunc {
     console.log(compiler.compile(templateSource));

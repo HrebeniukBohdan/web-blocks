@@ -1,19 +1,20 @@
-import { ConstructorClass } from "./types";
+import { WbComponent } from './../vdom/component';
+import { ComponentFactory, ConstructorClass } from "./types";
 
 class WbGlobalModule {
-    private components: Map<string, ConstructorClass> = new Map();
+    private components: Map<string, ComponentFactory> = new Map();
     private modificators: Map<string, ConstructorClass> = new Map();
     private filters: Map<string, ConstructorClass> = new Map();
 
-    registerComponent(name: string, compClass: ConstructorClass): void {
+    registerComponentFactory(name: string, compClass: ConstructorClass): void {
         if (this.isEntityRegistered(name, 'C')) {
             throw new Error(`The component with the name "${name} already exists"`);
         }
 
-        this.components.set(name, compClass);
+        this.components.set(name, () => new WbComponent(compClass as any));
     }
 
-    getComponent(name: string): ConstructorClass {
+    getComponentFactory(name: string): ComponentFactory {
         if (!this.isEntityRegistered(name, 'C')) {
             throw new Error(`The component with the name "${name} has not registered"`);
         }

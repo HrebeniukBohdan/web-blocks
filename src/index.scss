@@ -35,7 +35,6 @@ ul {
 
 /* Style the list items */
 ul li {
-  cursor: pointer;
   position: relative;
   padding: 12px 8px 12px 40px;
   background: #eee;
@@ -93,6 +92,11 @@ ul li.checked::before {
   color: white;
 }
 
+.close,
+.title {
+  cursor: pointer;
+}
+
 /* Style the header */
 .header {
   background-color: #f44336;
@@ -135,4 +139,9 @@ input {
 
 .addBtn:hover {
   background-color: #bbb;
+}
+
+.selected-item {
+  color: #ddd !important;
+  background-color: #555 !important;
 }

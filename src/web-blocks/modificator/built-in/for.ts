@@ -27,6 +27,8 @@ export class WbForModificator implements IModificator {
         const indName = currentIndexName || CURRENT_INDEX_NAME;
         const result: VNodeChildren = [];
         let currentRenderedElem: VNode;
+        console.log('Render list wbFor');
+        console.log(iterList);
 
         scope[indName] = 0;
 
@@ -35,13 +37,13 @@ export class WbForModificator implements IModificator {
 
             currentRenderedElem = renderContent();
             currentRenderedElem.key = 
-                this.isTrackBy(iterator, trackBy) ? 
-                    (iterator as KeyValueMap)[trackBy] : scope[indName];
+                this.isTrackBy(iterator, trackBy) ?? scope[indName];
             result.push(currentRenderedElem);
 
             scope[indName] = scope[indName] + 1;
         }
 
+        console.log(result);
         return result.length > 0 ? result : null;
     }
 

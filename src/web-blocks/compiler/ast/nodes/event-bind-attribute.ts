@@ -19,8 +19,9 @@ export class EvBindAttribute implements EventBindAttribute {
     }
 
     execCallback(): string {
-        return ' function cb_' + this.num + '() {\n' +
+        return ' const cb_' + this.num + ' = l(function() {\n' +
           '   var event = arguments[0]; \n' +
-          `   ${this.functionNode.exec()};` + '\n };\n\n';
+          '   console.log(ctx); \n' +
+          `   ${this.functionNode.exec()};` + '\n });\n\n';
     }
 }

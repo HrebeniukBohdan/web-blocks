@@ -1,3 +1,4 @@
+import { WbComponent } from './../vdom/component';
 import { SignalType } from './decorator';
 import { VNodeChildren } from 'snabbdom/build';
 import { ForwardedType } from "../di";
@@ -57,3 +58,5 @@ export interface WbChange {
 export interface WbDestroy {
     wbDestroy: () => void;
 }
+
+export type ComponentFactory = () => WbComponent<any, any>;
