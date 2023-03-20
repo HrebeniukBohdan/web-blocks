@@ -26,6 +26,11 @@ interface RemoveOperation {
   kind: 'remove'
 }
 
+interface ReorderOperation {
+  kind: 'reorder',
+  offset: number
+}
+
 interface SkipOperation {
   kind: 'skip'
 }
@@ -39,6 +44,7 @@ export type ChildUpdater =
   | UpdateOperation
   | ReplaceOperation
   | RemoveOperation
+  | ReorderOperation
   | SkipOperation
   | InsertOperation
 
@@ -53,6 +59,8 @@ const update = (attributes: AttributesUpdater, childeren: ChildUpdater[]): Updat
 })
 
 const remove = (): RemoveOperation => ({ kind: 'remove' })
+
+const reorder = (offset: number): ReorderOperation => ({ kind: 'reorder', offset })
 
 const insert = (node: VDomNode): InsertOperation => ({ kind: 'insert', node })
 
@@ -103,7 +111,7 @@ export const createDiff = (oldNode: VDomNode, newNode: VDomNode): VDomNodeUpdate
   // get the updated and replaces attributes
   const attUpdater: AttributesUpdater = {
     remove: Object.keys(oldNode.props || {})
-      .filter(att => Object.keys(newNode).indexOf(att) == -1),
+      .filter(att => Object.keys(newNode.props || {}).indexOf(att) == -1),
     set: Object.keys(newNode.props || {})
       .filter(att => oldNode.props[att] != newNode.props[att])
       .reduce((upd, att) => ({ ...upd, [att]: newNode.props[att] }), {})
@@ -125,9 +133,24 @@ const removeUntilkey = (operations: ChildUpdater[], elems: [string | number, VDo
   }
 }
 
-const insertUntilKey = (operations: ChildUpdater[], elems: [string | number, VDomNode][], key: string | number) => {
-  while(elems[0] && elems[0][0] != key) {
-    operations.push(insert(elems.shift()[1]))
+const insertOrReorderUntilKey = (
+  operations: ChildUpdater[],
+  oldElems: [string | number, VDomNode][],
+  newElems: [string | number, VDomNode][],
+  key: string | number
+) => {
+  while(newElems[0] && newElems[0][0] != key) {
+    const currentElemKey = newElems[0][0];
+    const fromIndex = oldElems.findIndex(
+      (elem, index) => index && elem[0] === currentElemKey
+    );
+
+    if (fromIndex > 0) {
+      operations.push(reorder(fromIndex));
+      operations.push(createDiff(oldElems.splice(fromIndex, 1)[0][1], newElems.shift()[1]));
+    } else {
+      operations.push(insert(newElems.shift()[1]));
+    }
   }
 }
 
@@ -146,7 +169,7 @@ const childsDiff = (oldChilds: VDomNode[], newChilds: VDomNode[]): ChildUpdater[
     removeUntilkey(operations, remainingOldChilds, nextUpdateKey)
     
     // then insert all new childs before the update
-    insertUntilKey(operations, remainingNewChilds, nextUpdateKey)
+    insertOrReorderUntilKey(operations, remainingOldChilds, remainingNewChilds, nextUpdateKey)
 
     // create the update
     operations.push(createDiff(remainingOldChilds.shift()[1], remainingNewChilds.shift()[1]))
@@ -159,7 +182,7 @@ const childsDiff = (oldChilds: VDomNode[], newChilds: VDomNode[]): ChildUpdater[
   removeUntilkey(operations, remainingOldChilds, undefined)
 
   // insert all remaing new childs after the last update
-  insertUntilKey(operations, remainingNewChilds, undefined)
+  insertOrReorderUntilKey(operations, remainingOldChilds, remainingNewChilds, undefined)
 
   return operations
 }

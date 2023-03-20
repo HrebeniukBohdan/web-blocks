@@ -160,6 +160,6 @@ export class WbComponent<P, S> {
         }
 
         console.log(`Render ${this.ωß_COMPONENT_NAME}`);
-        return h(this.ωß_COMPONENT_NAME, {}, this.ωß_renderTemplate(this.ωß_state, useCachedListener));
+        return h(this.ωß_COMPONENT_NAME, {}, this.ωß_renderTemplate(this.ωß_state, useCachedListener as any));
     }
 }

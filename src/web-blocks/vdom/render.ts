@@ -44,8 +44,12 @@ export const applyUpdate = (elem: HTMLElement | Text, diff: VDomNodeUpdater): HT
 
   if('wholeText' in elem) throw new Error('invalid update for Text node')
 
-  for (const att in diff.attributes.remove) {
-    elem.removeAttribute(att)
+  const removeAttrList = diff.attributes.remove;
+  for (let i = 0; i < removeAttrList.length; i++) {
+    const attrName = removeAttrList[i];
+    elem.removeAttribute(
+      attrName === 'className' ? 'class' : attrName
+    );
   }
 
   for (const att in diff.attributes.set) {
@@ -72,8 +76,20 @@ const applyChildrenDiff = (elem: HTMLElement, operations: ChildUpdater[]) => {
       }
       continue
     }
-    
+
     const childElem = elem.childNodes[i + offset]
+
+    if (childUpdater.kind == 'reorder') {
+      const targetElem = elem.childNodes[i + offset + childUpdater.offset];
+      if (elem.childNodes[i + offset - 1]) {
+        elem.childNodes[i + offset - 1].after(targetElem)
+      } else {
+        elem.prepend(targetElem)
+      }
+      applyUpdate(targetElem as HTMLElement, operations[++i] as VDomNodeUpdater)
+      offset -= 1
+      continue
+    }
 
     if (childUpdater.kind == 'remove') {
       childElem.remove()

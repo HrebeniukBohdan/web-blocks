@@ -118,8 +118,8 @@ type NativeEventListener<T> = (event: T) => void;
 function patchClassName(props: Props) {
   if (props.class) {
     props.className = props.class;
-    delete props.class;
   }
+  delete props.class;
 
   return props;
 }
