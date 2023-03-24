@@ -1,9 +1,13 @@
 import { VDomNode } from "./virtual_dom";
 import { ChildUpdater, VDomNodeUpdater } from "./diffs";
 
-const renderElement = (rootNode: VDomNode): HTMLElement | Text => {
+const renderElement = (rootNode: VDomNode): HTMLElement | Text | Comment => {
   if (rootNode.kind == 'text') {
     return document.createTextNode(rootNode.value)
+  }
+
+  if (rootNode.kind == 'comment') {
+    return document.createComment(rootNode.value)
   }
 
   if(rootNode.kind == 'component') {
@@ -32,7 +36,7 @@ const renderElement = (rootNode: VDomNode): HTMLElement | Text => {
   return elem
 }
 
-export const applyUpdate = (elem: HTMLElement | Text, diff: VDomNodeUpdater): HTMLElement | Text => {
+export const applyUpdate = (elem: HTMLElement | Text | Comment, diff: VDomNodeUpdater): HTMLElement | Text | Comment => {
   if (diff.kind == 'skip') return elem 
 
   if (diff.kind == 'replace') {
@@ -42,7 +46,13 @@ export const applyUpdate = (elem: HTMLElement | Text, diff: VDomNodeUpdater): HT
     return newElem
   }
 
-  if('wholeText' in elem) throw new Error('invalid update for Text node')
+  if (elem instanceof Comment) {
+    throw new Error('invalid update for Comment node');
+  }
+  
+  if('wholeText' in elem) {
+    throw new Error('invalid update for Text node');
+  }
 
   const removeAttrList = diff.attributes.remove;
   for (let i = 0; i < removeAttrList.length; i++) {

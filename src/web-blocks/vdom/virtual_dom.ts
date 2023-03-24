@@ -26,10 +26,17 @@ export interface VDOMText {
   key?: string
 }
 
+export interface VDOMComment {
+  kind: 'comment',
+  value: string
+  key?: string
+}
+
 export type VDomNode = 
   | VDOMText
   | VDOMElement
   | VDOMComponent
+  | VDOMComment
 
 export const createElement = (tagname: string, props: VDOMAttributes & { key?: string }, childeren: VDomNode[] = []): VDOMElement => {
   const key = props.key || defaultKey
@@ -47,4 +54,8 @@ export const createComponent = <P extends object>(componentFactory: () => WbComp
 
 export const createText = (value: string | number | boolean, key: string = '') : VDOMText => ({
   key, kind: 'text', value: value.toString()
+})
+
+export const createComment = (value: string | number | boolean, key: string = '') : VDOMComment => ({
+  key, kind: 'comment', value: value.toString()
 })

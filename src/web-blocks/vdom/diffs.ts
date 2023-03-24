@@ -19,7 +19,7 @@ interface UpdateOperation {
 interface ReplaceOperation {
   kind: 'replace',
   newNode: VDomNode
-  callback?: (elem: HTMLElement | Text) => void
+  callback?: (elem: HTMLElement | Text | Comment) => void
 }
 
 interface RemoveOperation {
@@ -70,12 +70,14 @@ const isEqual = (comparableItemNames: string[], val1: any, val2: any): boolean =
 
 export const createDiff = (oldNode: VDomNode, newNode: VDomNode): VDomNodeUpdater => {
   // skip over text nodes with the same text
-  if (oldNode.kind == 'text' && newNode.kind == 'text' && oldNode.value == newNode.value) {
+  if ((oldNode.kind == 'text' && newNode.kind == 'text' && oldNode.value == newNode.value)
+        || (oldNode.kind == 'comment' && newNode.kind == 'comment' && oldNode.value == newNode.value)) 
+  {
     return skip()
   }
 
   // If a textnode is updated we need to replace it completly
-  if (oldNode.kind == 'text' || newNode.kind == 'text') {
+  if (oldNode.kind == 'text' || newNode.kind == 'text' || oldNode.kind == 'comment' || newNode.kind == 'comment') {
     return replace(newNode)
   }
 

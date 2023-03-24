@@ -1,6 +1,6 @@
 import { WbComponent } from "./component";
 import { isArray, isEmpty, isText } from "./utils";
-import { VDomNode, createText, createElement, VDOMAttributes, VDOMComponent, createComponent } from "./virtual_dom";
+import { VDomNode, createText, createElement, VDOMAttributes, VDOMComponent, createComponent, createComment } from "./virtual_dom";
 
 interface GlobalEventHandlersEventMap {
   abort: UIEvent;
@@ -203,6 +203,10 @@ export function h(sel: any, b?: any, c?: any): VDomNode {
     } else {
       data = b;
     }
+  }
+
+  if (sel === '!' && data && isText(data.props)) {
+    return createComment(data.props as any);
   }
 
   if (children !== undefined) {

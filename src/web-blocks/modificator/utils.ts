@@ -1,5 +1,6 @@
+import { VDomNode } from './../vdom/virtual_dom';
+import { VDomNodeChildren } from './../vdom/h';
 import { injectDependency } from './../di/di';
-import { VNodeChildren, VNode } from 'snabbdom/build';
 import { wbModule } from '../core/module';
 import { IModificator, IScope, ModificatorProps, ModificatorRenderContentFunc } from "./types";
 
@@ -32,7 +33,7 @@ export function renderModificator(
     scope: IScope,
     props: ModificatorProps,
     renderFunc: ModificatorRenderContentFunc
-): VNodeChildren|VNode|null {
+): VDomNodeChildren|VDomNode|null {
     const modificatorClass = wbModule.getModificator(name);
     const modInstance: IModificator = injectDependency(modificatorClass as any);
 

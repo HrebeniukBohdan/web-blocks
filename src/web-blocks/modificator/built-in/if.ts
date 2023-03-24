@@ -1,4 +1,4 @@
-import { VNode } from "snabbdom/build";
+import { VDomNode } from './../../vdom/virtual_dom';
 import { Modificator } from "../decorator";
 import { IModificator } from "../types";
 
@@ -10,7 +10,7 @@ interface WbIfProps {
     selector: 'if'
 })
 export class WbIfModificator implements IModificator {
-    modify(renderContent: () => VNode, { condition }: WbIfProps): VNode|null {
+    modify(renderContent: () => VDomNode, { condition }: WbIfProps): VDomNode|null {
         return condition ? renderContent() : null;
     }
 }

@@ -10,6 +10,7 @@ import { TodoTaskData } from '../types';
             <span @click={{$newElement()}} class="addBtn">Add</span>
         </div>
 
+        <!-- Items list -->
         <ul>
             <%wb-for iterable={{$sortedTasks()}} trackBy='id' %>
                 <wb-todo-item 
@@ -29,7 +30,7 @@ export class TodoList implements WbInit {
         { id: 3, text: '4. Buy eggs', done: false },
         { id: 4, text: '5. Make your own Angular', done: true }
     ];
-    @State textValue = 'yo';
+    @State textValue = '';
 
     currentId = 5;
 

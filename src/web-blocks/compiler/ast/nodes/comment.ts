@@ -5,6 +5,6 @@ export class CommentNode implements Node {
     constructor(private comment: string) {}
 
     exec(): string {
-        return `h("!", {}, "${this.comment}")`;
+        return `h("!", "${this.comment}")`;
     }
 }

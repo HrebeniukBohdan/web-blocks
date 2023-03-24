@@ -11,7 +11,7 @@ import { L } from '../core/compile';
 
 interface WebComponentHooks {
     wbInit?: () => void;
-    wbViewInit?: (elem: HTMLElement | Text) => void;
+    wbViewInit?: (elem: HTMLElement | Text | Comment) => void;
     wbChange?: () => void;
     wbDestroy?: () => void;
 }
@@ -59,7 +59,7 @@ export class WbComponent<P, S> {
     }
     
     private currentRootNode: VDomNode
-    private mountedElement: HTMLElement | Text
+    private mountedElement: HTMLElement | Text | Comment
     
     private setState() {
         if(this.mountedElement == undefined) {
@@ -116,7 +116,7 @@ export class WbComponent<P, S> {
         return diff
     }
     
-    public notifyMounted(elem: HTMLElement | Text) {
+    public notifyMounted(elem: HTMLElement | Text | Comment) {
         this.mountedElement = elem
         setTimeout(() => this.componentDidInit())
         setTimeout(() => this.componentDidMount(elem))
@@ -133,7 +133,7 @@ export class WbComponent<P, S> {
         this.ωß.wbInit && this.ωß.wbInit();
     }
 
-    public componentDidMount(elem: HTMLElement | Text) {
+    public componentDidMount(elem: HTMLElement | Text | Comment) {
         this.ωß.wbViewInit && this.ωß.wbViewInit(elem);
     }
 

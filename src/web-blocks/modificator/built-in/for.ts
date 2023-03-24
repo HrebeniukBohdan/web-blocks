@@ -1,7 +1,8 @@
+import { createComment, VDomNode } from './../../vdom/virtual_dom';
 import { KeyValueMap } from './../../core/types';
-import { VNode, VNodeChildren } from "snabbdom/build";
 import { Modificator } from "../decorator";
 import { IModificator, IScope } from "../types";
+import { VDomNodeChildren } from '../../vdom/h';
 
 interface WbForProps {
     iterable: Array<unknown>;
@@ -18,15 +19,15 @@ const CURRENT_INDEX_NAME = 'index';
 })
 export class WbForModificator implements IModificator {
     modify(
-        renderContent: () => VNode,
+        renderContent: () => VDomNode,
         { iterable, currentValueName, currentIndexName, trackBy }: WbForProps,
         scope: IScope
-    ): VNodeChildren|null {
+    ): VDomNodeChildren {
         const iterList = iterable || [];
         const valName = currentValueName || CURRENT_VALUE_NAME;
         const indName = currentIndexName || CURRENT_INDEX_NAME;
-        const result: VNodeChildren = [];
-        let currentRenderedElem: VNode;
+        const result: VDomNodeChildren = [];
+        let currentRenderedElem: VDomNode;
         console.log('Render list wbFor');
         console.log(iterList);
 
@@ -44,7 +45,9 @@ export class WbForModificator implements IModificator {
         }
 
         console.log(result);
-        return result.length > 0 ? result : null;
+        result.unshift(createComment(' wb-for '))
+        result.push(createComment(' wb-for-end '))
+        return result;
     }
 
     private isTrackBy(iter: unknown, trackBy?: string): boolean {
