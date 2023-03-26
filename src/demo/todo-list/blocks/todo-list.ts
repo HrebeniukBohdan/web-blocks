@@ -6,20 +6,28 @@ import { TodoTaskData } from '../types';
     template: `
         <div class="header">
             <h2>My To Do List</h2>
-            <input type="text" placeholder="Title..." value={{$textValue}} @change={{$onTextChange($$event)}} />
-            <span @click={{$newElement()}} class="addBtn">Add</span>
+            <input 
+                type="text"
+                placeholder="Title..."
+                value={{$textValue}}
+                @keyup={{$onKeyup($$event)}}
+                @change={{$onTextChange($$event)}}
+            />
+            <span @click={{$newElement()}} class="addBtn">Add Item</span>
         </div>
 
         <!-- Items list -->
-        <ul>
-            <%wb-for iterable={{$sortedTasks()}} trackBy='id' %>
-                <wb-todo-item 
-                    data={{$current}}
-                    @close={{$removeTask($$event)}}
-                    @statusChange={{$changeItemStatus($$event)}}
-                />
-            <%/wb-for%>
-        </ul>
+        <%wb-if condition={{true}}%>
+            <ul>
+                <%wb-for iterable={{$tasks|taskSort}} trackBy='id' %>
+                    <wb-todo-item 
+                        data={{$current}}
+                        @close={{$removeTask($$event)}}
+                        @statusChange={{$changeItemStatus($$event)}}
+                    />
+                <%/wb-for%>
+            </ul>
+        <%/wb-if%>
     `
 })
 export class TodoList implements WbInit {
@@ -43,9 +51,19 @@ export class TodoList implements WbInit {
         console.log(this.tasks);
     }
 
+    wbDestroy(): void {
+        console.log('wb destroy list');
+    }
+
     onTextChange(event: any): void {
-        console.log(event);
         this.textValue = event.target.value;
+    }
+
+    onKeyup(event: KeyboardEvent): void {
+        if (event.code === 'Enter') {
+            event.preventDefault();
+            this.newElement();
+        }
     }
 
     newElement(): void {
@@ -54,7 +72,7 @@ export class TodoList implements WbInit {
                 ...this.tasks,
                 {
                     id: this.currentId,
-                    text: this.textValue,
+                    text: `${this.currentId + 1}. ${this.textValue}`,
                     done: false
                 }
             ];
@@ -62,17 +80,6 @@ export class TodoList implements WbInit {
             this.currentId++;
             this.textValue = '';
         }
-    }
-
-    sortedTasks(): TodoTaskData[] {
-        const array = [...this.tasks].sort((aTask, bTask) => {
-            if (!aTask.done && bTask.done) return -1;
-            if (aTask.done && !bTask.done) return 1;
-            return 0;
-        });
-        console.log('Sorted');
-        console.log(array);
-        return array;
     }
 
     removeTask(id: number): void {

@@ -35,6 +35,11 @@ export class TodoItem {
         console.log(this.data);
     }
 
+    wbDestroy(): void {
+        console.log('wb destroy item');
+        console.log(this.data);
+    }
+
     onCloseClick(): void {
         this.close(this.data.id);
     }

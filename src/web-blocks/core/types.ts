@@ -42,6 +42,10 @@ export interface IModule {
     new(): any; 
 }
 
+export interface IFilter {
+    transform(value: any, ...args: any[]): any;
+}
+
 /** WebBlock hooks interfaces **/
 export interface WbInit {
     wbInit: () => void;

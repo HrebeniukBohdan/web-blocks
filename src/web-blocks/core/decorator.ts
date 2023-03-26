@@ -6,6 +6,7 @@ import { wbModule } from "./module";
 import { ConstructorClass } from "./types";
 import { compileTemplate, L } from "./compile";
 import { renderWebBlock } from "./render";
+import { useFilter } from './filter';
 import 'reflect-metadata';
 
 const h = renderWebBlock;
@@ -13,6 +14,7 @@ const m = renderModificator;
 const a = flattenArray;
 const s = createScope;
 const g = getScopeProp;
+const uf = useFilter;
 
 type H = typeof renderWebBlock;
 type ManualRenderTemplateFunc = (ctx: unknown, h: H) => VDomNodeChildren;
@@ -25,7 +27,8 @@ export function WbModule<TClass extends ConstructorClass>(params: {
     root: ConstructorClass,
     blocks?: ConstructorClass[],
     modificators?: ConstructorClass[],
-    services?: ConstructorClass[]
+    services?: ConstructorClass[],
+    filters?: ConstructorClass[]
 }): (target: TClass) => IModule {
     return function (target: TClass): IModule {
         const t: any = target;
@@ -50,7 +53,7 @@ export function WebBlock<TClass extends ConstructorClass>(params: {
 
         if (typeof params.template === 'string') {
             const renderTemplate = compileTemplate(params.template);
-            t.ωß_Template = (ctx: unknown, l: L) => renderTemplate(h, m, s, g, a, l, ctx);
+            t.ωß_Template = (ctx: unknown, l: L) => renderTemplate(h, m, s, g, a, l, uf, ctx);
         } else 
         if (typeof params.template === 'function') {
             const renderTemplate = params.template;

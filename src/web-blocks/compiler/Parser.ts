@@ -3,6 +3,7 @@ import { CommentNode } from "./ast/nodes/comment";
 import { ElementNode } from "./ast/nodes/element";
 import { EvBindAttribute } from "./ast/nodes/event-bind-attribute";
 import { EventVariableNode } from "./ast/nodes/event-variable";
+import { FilterNode } from "./ast/nodes/filter";
 import { FunctionNode } from "./ast/nodes/function";
 import { InterpolationAttribute } from "./ast/nodes/interpolation-attribute";
 import { ModificatorNode } from "./ast/nodes/modificator";
@@ -266,6 +267,10 @@ export class Parser {
         return this.currentTokenType === 'ID';
     }
 
+    private isFilterIdentifier(): boolean {
+        return this.currentTokenType === 'FILTER_ID';
+    }
+
     private isEvent(): boolean {
         return this.currentTokenType === 'EVENT';
     }
@@ -280,6 +285,33 @@ export class Parser {
 
     private isComma(): boolean {
         return this.currentTokenType === 'COMMA';
+    }
+
+    private isColon(): boolean {
+        return this.currentTokenType === 'COLON';
+    }
+
+    private FilterParameterExpression(scope: ScopedElement): Node {
+        let node: Node;
+
+        this.consumeToken('COLON');
+
+        if (this.isNumber()) {
+            node = new NumberNode(this.consumeToken('NUMBER').value);
+        } else
+        if (this.isBoolean()) {
+            node = this.Boolean();
+        } else 
+        if (this.isString()) {
+            node = new StringNode(this.consumeToken('STRING').value);
+        } else 
+        if (this.isIdentifier()) {
+            node = new VariableNode(this.consumeToken('ID').value, scope);
+        } else {
+            throw new Error('Expected to parse either StringLiteral, NumberLiteral or Variable');
+        }
+
+        return node;
     }
 
     private ParameterExpression(scope: ScopedElement): Node {
@@ -306,6 +338,7 @@ export class Parser {
 
         return node;
     }
+
     private FunctionExpression(functionName: string, scope: ScopedElement): FunctionNode {
         const funcNode = new FunctionNode(functionName);
         this.consumeToken('PAREN_L');
@@ -319,6 +352,20 @@ export class Parser {
         this.consumeToken('PAREN_R');
 
         return funcNode;
+    }
+
+    private FilterExpression(filterName: string, idToken: Token, scope: ScopedElement): FilterNode {
+        const filterNode = new FilterNode(filterName);
+
+        filterNode.addInputParam(new VariableNode(idToken.value, scope))
+
+        while (this.isColon()) {
+            filterNode.addNode(
+                this.FilterParameterExpression(scope)
+            );
+        }
+
+        return filterNode;
     }
 
     private EventParameterExpression(scope: ScopedElement): Node {
@@ -348,6 +395,7 @@ export class Parser {
 
         return node;
     }
+
     private EventFunctionExpression(functionName: string, scope: ScopedElement): FunctionNode {
         const funcNode = new FunctionNode(functionName);
         this.consumeToken('PAREN_L');
@@ -387,6 +435,10 @@ export class Parser {
 
         const idName = this.consumeToken('ID');
 
+        if (this.isFilterIdentifier()) {
+            const filterId = this.consumeToken('FILTER_ID');
+            expression = this.FilterExpression(filterId.value, idName, scope);
+        } else 
         if (this.isParenL()) {
             expression = this.FunctionExpression(idName.value, scope);
         } else 

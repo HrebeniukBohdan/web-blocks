@@ -1,4 +1,5 @@
 import { BooleanNode } from "./nodes/boolean";
+import { FilterNode } from "./nodes/filter";
 import { FunctionNode } from "./nodes/function";
 import { NumberNode } from "./nodes/number";
 import { StringNode } from "./nodes/string";
@@ -50,4 +51,4 @@ export type Attributes = { [attrName: string]: Attribute };
 
 export type EventBindings = { [eventName: string]: EventBindAttribute };
 
-export type ExpressionNode = BooleanNode|StringNode|NumberNode|VariableNode|FunctionNode;
+export type ExpressionNode = BooleanNode|StringNode|NumberNode|VariableNode|FilterNode|FunctionNode;
