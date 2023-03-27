@@ -14,10 +14,11 @@ import { TodoTaskData } from '../types';
                 @change={{$onTextChange($$event)}}
             />
             <span @click={{$newElement()}} class="addBtn">Add Item</span>
+            <span @click={{$switchVisibility()}} class="addBtn">Switch</span>
         </div>
 
         <!-- Items list -->
-        <%wb-if condition={{true}}%>
+        <%wb-if condition={{$visible}}%>
             <ul>
                 <%wb-for iterable={{$tasks|taskSort}} trackBy='id' %>
                     <wb-todo-item 
@@ -41,6 +42,12 @@ export class TodoList implements WbInit {
     @State textValue = '';
 
     currentId = 5;
+
+    @State visible = false;
+
+    switchVisibility(): void {
+        this.visible = !this.visible;
+    }
 
     wbInit(): void {
         console.log(this);

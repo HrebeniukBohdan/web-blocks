@@ -7,7 +7,7 @@ export type VDOMAttributes = { [attrName: string]: string | number | boolean | F
 export interface VDOMElement {
   kind: 'element'
   tagname: string
-  childeren?: VDomNode[]
+  children?: VDomNode[]
   props?: VDOMAttributes
   key?: string
 }
@@ -38,10 +38,10 @@ export type VDomNode =
   | VDOMComponent
   | VDOMComment
 
-export const createElement = (tagname: string, props: VDOMAttributes & { key?: string }, childeren: VDomNode[] = []): VDOMElement => {
+export const createElement = (tagname: string, props: VDOMAttributes & { key?: string }, children: VDomNode[] = []): VDOMElement => {
   const key = props.key || defaultKey
   delete props.key
-  return ({ kind: 'element', tagname, props, childeren, key })
+  return ({ kind: 'element', tagname, props, children, key })
 }
 
 export const createComponent = <P extends object>(componentFactory: () => WbComponent<P, any>, props: P & { key?: string }): VDOMComponent => {

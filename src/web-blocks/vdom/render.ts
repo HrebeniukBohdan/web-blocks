@@ -29,7 +29,7 @@ const renderElement = (rootNode: VDomNode): HTMLElement | Text | Comment => {
     (elem as any)[att] = rootNode.props[att]
   }
 
-  (rootNode.childeren || []).forEach(child =>
+  (rootNode.children || []).forEach(child =>
     elem.appendChild(renderElement(child))
   )
 

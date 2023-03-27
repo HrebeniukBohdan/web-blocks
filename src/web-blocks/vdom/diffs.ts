@@ -1,3 +1,4 @@
+import { unmountNestedComponents } from "./utils";
 import { VDOMAttributes, VDomNode } from "./virtual_dom";
 
 type AttributesUpdater = {
@@ -97,6 +98,7 @@ export const createDiff = (oldNode: VDomNode, newNode: VDomNode): VDomNodeUpdate
   
   // replace with different component
   if(newNode.kind == 'component') {
+    oldNode.kind === 'element' && unmountNestedComponents(oldNode);
     newNode.instance = newNode.componentFactory()
     return { 
       kind: 'replace', 
@@ -107,6 +109,7 @@ export const createDiff = (oldNode: VDomNode, newNode: VDomNode): VDomNodeUpdate
 
   // If the tagname of a node is changed we have to replace it completly
   if (oldNode.tagname != newNode.tagname) {
+    unmountNestedComponents(oldNode);
     return replace(newNode)
   }
 
@@ -119,7 +122,7 @@ export const createDiff = (oldNode: VDomNode, newNode: VDomNode): VDomNodeUpdate
       .reduce((upd, att) => ({ ...upd, [att]: newNode.props[att] }), {})
   }
 
-  const childsUpdater: ChildUpdater[] = childsDiff((oldNode.childeren || []), (newNode.childeren || []))
+  const childsUpdater: ChildUpdater[] = childsDiff((oldNode.children || []), (newNode.children || []))
 
   return update(attUpdater, childsUpdater)
 }
@@ -129,7 +132,11 @@ const removeUntilkey = (operations: ChildUpdater[], elems: [string | number, VDo
     if(elems[0][1].kind == 'component') {
       elems[0][1].instance.unmount()
       elems[0][1].instance = null
+    } else
+    if (elems[0][1].kind === 'element') {
+      unmountNestedComponents(elems[0][1]);
     }
+
     operations.push(remove())
     elems.shift()
   }
