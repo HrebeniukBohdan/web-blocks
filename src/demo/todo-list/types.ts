@@ -3,3 +3,8 @@ export interface TodoTaskData {
     text: string;
     done: boolean;
 }
+
+export interface IOption {
+    name: string;
+    value: string;
+}

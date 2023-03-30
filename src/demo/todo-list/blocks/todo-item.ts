@@ -30,6 +30,11 @@ export class TodoItem {
         console.log(this.data);
     }
 
+    wbViewInit(elem: HTMLElement): void {
+        console.log('wb view init item');
+        console.log(elem);
+    }
+
     wbChange(): void {
         console.log('wb change item');
         console.log(this.data);

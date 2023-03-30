@@ -145,3 +145,18 @@ input {
   color: #ddd !important;
   background-color: #555 !important;
 }
+
+.filter-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #F44336;
+  padding-bottom: 1.5em;
+}
+
+.filter-text {
+  color: #fff;
+  font-weight: bold;
+  margin-right: 20px;
+  margin-bottom: 2px;
+}

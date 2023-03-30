@@ -7,10 +7,26 @@ import { IModificator, IScope, ModificatorProps, ModificatorRenderContentFunc } 
 export function getScopeProp(key: string, scope: IScope): unknown {
     let currentScope = scope;
     while(currentScope) {
-        // eslint-disable-next-line no-prototype-builtins
-        if (currentScope.hasOwnProperty(key) || currentScope.hasOwnProperty(`ωß_${key}`)) {
-            return currentScope[key];
+        if (key.includes('.')) {
+            const path = key.split('.');
+            let currentObjectValue = currentScope[path[0]];
+            for (let index = 1; index < path.length; index++) {
+                if (typeof currentObjectValue === 'object') {
+                    currentObjectValue = currentObjectValue[path[index]];
+                } else {
+                    throw new Error(
+                        `ObjectPathReadingError: "${path.slice(0, index).join('.')}" path property is not defined within current scope or it's not of Object type.`
+                    );
+                }
+            }
+            return currentObjectValue;
+        } else {
+            // eslint-disable-next-line no-prototype-builtins
+            if (currentScope.hasOwnProperty(key) || currentScope.hasOwnProperty(`ωß_${key}`)) {
+                return currentScope[key];
+            }
         }
+        
         currentScope = currentScope.$$parent;
         if (!currentScope) {
             throw new Error(`"${key}" property is not defined within current scope.`);

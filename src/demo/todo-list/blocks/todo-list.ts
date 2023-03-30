@@ -1,11 +1,11 @@
 import { State, WbInit, WebBlock } from '../../../web-blocks/core';
-import { TodoTaskData } from '../types';
+import { IOption, TodoTaskData } from '../types';
 
 @WebBlock({
     selector: 'todo-list',
     template: `
         <div class="header">
-            <h2>My To Do List</h2>
+            <h2>My To-Do List</h2>
             <input 
                 type="text"
                 placeholder="Title..."
@@ -14,21 +14,26 @@ import { TodoTaskData } from '../types';
                 @change={{$onTextChange($$event)}}
             />
             <span @click={{$newElement()}} class="addBtn">Add Item</span>
-            <span @click={{$switchVisibility()}} class="addBtn">Switch</span>
+        </div>
+        <div class="filter-bar">
+            <span class="filter-text">Sort by:</span>
+            <wb-todo-filter 
+                currentValue={{$filterValue}}
+                options={{$filterOptions}}
+                @valueChange={{$onFilterValueChange($$event)}}
+            />
         </div>
 
         <!-- Items list -->
-        <%wb-if condition={{$visible}}%>
-            <ul>
-                <%wb-for iterable={{$tasks|taskSort}} trackBy='id' %>
-                    <wb-todo-item 
-                        data={{$current}}
-                        @close={{$removeTask($$event)}}
-                        @statusChange={{$changeItemStatus($$event)}}
-                    />
-                <%/wb-for%>
-            </ul>
-        <%/wb-if%>
+        <ul>
+            <%wb-for iterable={{$tasks|taskSort:$filterValue}} trackBy='id' %>
+                <wb-todo-item 
+                    data={{$current}}
+                    @close={{$removeTask($$event)}}
+                    @statusChange={{$changeItemStatus($$event)}}
+                />
+            <%/wb-for%>
+        </ul>
     `
 })
 export class TodoList implements WbInit {
@@ -40,14 +45,14 @@ export class TodoList implements WbInit {
         { id: 4, text: '5. Make your own Angular', done: true }
     ];
     @State textValue = '';
+    @State filterValue = 'asc';
+
+    filterOptions: IOption[] = [
+        { name: 'ASC', value: 'asc' },
+        { name: 'DESC', value: 'desc' },
+    ];
 
     currentId = 5;
-
-    @State visible = false;
-
-    switchVisibility(): void {
-        this.visible = !this.visible;
-    }
 
     wbInit(): void {
         console.log(this);
@@ -62,8 +67,13 @@ export class TodoList implements WbInit {
         console.log('wb destroy list');
     }
 
-    onTextChange(event: any): void {
-        this.textValue = event.target.value;
+    onFilterValueChange(newFilterValue: string): void {
+        this.filterValue = newFilterValue;
+    }
+
+    onTextChange(event: Event): void {
+        console.log(event);
+        this.textValue = (event.target as HTMLInputElement).value;
     }
 
     onKeyup(event: KeyboardEvent): void {

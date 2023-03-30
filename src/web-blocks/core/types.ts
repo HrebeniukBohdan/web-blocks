@@ -1,6 +1,6 @@
+import { VDomNodeChildren } from './../vdom/h';
 import { WbComponent } from './../vdom/component';
 import { SignalType } from './decorator';
-import { VNodeChildren } from 'snabbdom/build';
 import { ForwardedType } from "../di";
 
 export interface KeyValueMap {
@@ -30,7 +30,7 @@ export type WbComponentType = ConstructorClass & Injectable & {
     ωß_PROP_NAMES: string[];
     ωß_STATE_NAMES: string[];
     ωß_SIGNAL_NAMES: string[];
-    ωß_Template: (s: any) => VNodeChildren;
+    ωß_Template: (s: any) => VDomNodeChildren;
 };
 
 export interface IModule {

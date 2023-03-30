@@ -1,5 +1,5 @@
 export type TokenTypeName = 'COMMENT'|'OPEN_TAG'|'CLOSE_TAG'|'EVENT'|'EVENT_BIND'|'ATTRIBUTE'|'STRING'|'OPEN_MODIFICATOR_TAG'|'CLOSE_MODIFICATOR_TAG'|'OPEN_MODIFICATOR_TAG_CLOSE_SIGN'
-                |'SELF_CLOSE_TAG_SIGN'|'OPEN_TAG_CLOSE_SIGN'|'TEXT'|'TRUE'|'FALSE'|'FILTER_ID'|'COLON'|'INTERPOLATION_START'|'INTERPOLATION_END'|'ID'|'PAREN_L'|'PAREN_R'|'COMMA'|'NUMBER';
+                |'SELF_CLOSE_TAG_SIGN'|'OPEN_TAG_CLOSE_SIGN'|'OBJECT_PATH_ID'|'TEXT'|'TRUE'|'FALSE'|'FILTER_ID'|'COLON'|'INTERPOLATION_START'|'INTERPOLATION_END'|'ID'|'PAREN_L'|'PAREN_R'|'COMMA'|'NUMBER';
 export class TokenType {
     constructor(public name: TokenTypeName, public regex: string) {}
 }
@@ -60,12 +60,12 @@ export const tokenTypeList: TokenType[] = [
     new TokenType('EVENT', '\\s*\\$\\$event'),
     new TokenType('INTERPOLATION_START', '{{'),
     new TokenType('INTERPOLATION_END', '}}'),
-    new TokenType('ID', '\\s*\\$([a-zA-Z][a-zA-Z0-9\\_]*)'),
     new TokenType('TRUE', '\\s*true\\s*'),
     new TokenType('FALSE', '\\s*false\\s*'),
     new TokenType('PAREN_L', '\\s*\\('),
     new TokenType('PAREN_R', '\\s*\\)\\s*'),
     new TokenType('COMMA', '\\s*,\\s*'),
+    new TokenType('OBJECT_PATH_ID', '\\s*\\$([a-zA-Z][a-zA-Z0-9\\_]*(?:\\.[a-zA-Z][a-zA-Z0-9\\_]*)+)'),
     new TokenType('FILTER_ID', '\\s*\\|\\s*([a-zA-Z][a-zA-Z0-9\\_]*)'),
     new TokenType('ID', '\\s*\\$([a-zA-Z][a-zA-Z0-9\\_]*)'),
     new TokenType('NUMBER', '\\s*([\\d]*\\.[\\d]+)'),

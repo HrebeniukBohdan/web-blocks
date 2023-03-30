@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "description": "webpack typescript starter",
-  "name": "webpack-typescript-starter",
+  "description": "A simple SPA framework",
+  "name": "web-blocks",
   "keywords": [
     "webpack",
     "typescript",
@@ -9,10 +9,8 @@
     "sass"
   ],
   "dependencies": {
-    "maquette": "^3.5.2",
-    "reflect-metadata": "^0.1.13",
-    "snabbdom": "^3.4.0",
-    "virtual-dom": "^2.1.1"
+    "bootstrap-styles": "^5.2.3",
+    "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@types/jest": "^26.0.15",

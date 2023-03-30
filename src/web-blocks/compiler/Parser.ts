@@ -263,6 +263,10 @@ export class Parser {
         return this.currentTokenType === 'NUMBER';
     }
 
+    private isObjectPathIdentifier(): boolean {
+        return this.currentTokenType === 'OBJECT_PATH_ID';
+    }
+
     private isIdentifier(): boolean {
         return this.currentTokenType === 'ID';
     }
@@ -305,6 +309,9 @@ export class Parser {
         if (this.isString()) {
             node = new StringNode(this.consumeToken('STRING').value);
         } else 
+        if (this.isObjectPathIdentifier()) {
+            node = new VariableNode(this.consumeToken('OBJECT_PATH_ID').value, scope);
+        } else
         if (this.isIdentifier()) {
             node = new VariableNode(this.consumeToken('ID').value, scope);
         } else {
@@ -326,6 +333,9 @@ export class Parser {
         if (this.isString()) {
             node = new StringNode(this.consumeToken('STRING').value);
         } else 
+        if (this.isObjectPathIdentifier()) {
+            node = new VariableNode(this.consumeToken('OBJECT_PATH_ID').value, scope);
+        } else
         if (this.isIdentifier()) {
             node = new VariableNode(this.consumeToken('ID').value, scope);
         } else {
@@ -380,6 +390,9 @@ export class Parser {
         if (this.isString()) {
             node = new StringNode(this.consumeToken('STRING').value);
         } else 
+        if (this.isObjectPathIdentifier()) {
+            node = new VariableNode(this.consumeToken('OBJECT_PATH_ID').value, scope);
+        } else
         if (this.isIdentifier()) {
             node = new VariableNode(this.consumeToken('ID').value, scope);
         } else 
@@ -432,6 +445,12 @@ export class Parser {
             this.consumeToken('INTERPOLATION_END');
             return expression;
         } 
+
+        if (this.isObjectPathIdentifier()) {
+            expression = new VariableNode(this.consumeToken('OBJECT_PATH_ID').value, scope);
+            this.consumeToken('INTERPOLATION_END');
+            return expression;
+        }
 
         const idName = this.consumeToken('ID');
 
