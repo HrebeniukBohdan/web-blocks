@@ -160,3 +160,24 @@ input {
   margin-right: 20px;
   margin-bottom: 2px;
 }
+
+.btn-group > *:not(:last-child) > .btn {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.btn-group > *:not(:first-child) > .btn {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.todo-body {
+  position: relative;
+}
+
+.todo-loading {
+  background-color: rgba(0, 0, 0, 0.1);
+  top: 0;
+  position: absolute;
+  min-height: calc(100vh - 206px);
+  width: 100%;
+}

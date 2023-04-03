@@ -7,9 +7,11 @@ import { IOption } from '../types';
     template: `
         <div class="btn-group" role="group">
           <%wb-for iterable={{$options}} %>
-            <button type="button" class={{$activeClass($current.value)}} @click={{$onButtonClick($current.value)}}>
-              {{$current.name}}
-            </button>
+            <wb-todo-option-button 
+                option={{$current}}
+                selected={{$isSelected($current.value)}}
+                @optionValueSelected={{$onButtonClick($$event)}}
+              />
           <%/wb-for%>
         </div>
     `
@@ -24,13 +26,13 @@ export class TodoFilterSwitch implements WbInit {
       console.log('Filter Switch Init');
     }
 
+    isSelected(value: string): boolean {
+      return this.currentValue === value;
+    }
+
     onButtonClick(newValue: string): void {
       if (newValue !== this.currentValue) {
         this.valueChange(newValue);
       }
-    }
-
-    activeClass(value: string): string {
-      return `btn btn-light ${this.currentValue === value ? 'active' : ''}`;
     }
 }

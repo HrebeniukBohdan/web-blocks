@@ -22,7 +22,7 @@ export function unmountNestedComponents(elem: VDOMElement): void {
       (vnode as VDOMComponent).instance = null;
     } else 
     if (vnode.kind === 'element') {
-      unmountNestedComponents(elem);
+      unmountNestedComponents(vnode);
     }
   }
 }

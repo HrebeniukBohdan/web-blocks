@@ -1,4 +1,5 @@
 import { State, WbInit, WebBlock } from '../../../web-blocks/core';
+import { TodoApiService } from '../services/todo-api';
 import { IOption, TodoTaskData } from '../types';
 
 @WebBlock({
@@ -24,28 +25,33 @@ import { IOption, TodoTaskData } from '../types';
             />
         </div>
 
-        <!-- Items list -->
-        <ul>
-            <%wb-for iterable={{$tasks|taskSort:$filterValue}} trackBy='id' %>
-                <wb-todo-item 
-                    data={{$current}}
-                    @close={{$removeTask($$event)}}
-                    @statusChange={{$changeItemStatus($$event)}}
-                />
-            <%/wb-for%>
-        </ul>
+        <div class="todo-body">
+            <!-- Items list -->
+            <ul>
+                <%wb-for iterable={{$tasks|taskSort:$filterValue}} trackBy='id' %>
+                    <wb-todo-item 
+                        data={{$current}}
+                        @close={{$removeTask($$event)}}
+                        @statusChange={{$changeItemStatus($$event)}}
+                    />
+                <%/wb-for%>
+            </ul>
+
+            <%wb-unless condition={{$notLoading}} %>
+                <div class="d-flex justify-content-center align-items-center todo-loading">
+                    <div role="status" class="spinner-border text-danger">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            <%/wb-unless%>
+        </div>
     `
 })
 export class TodoList implements WbInit {
-    @State tasks: TodoTaskData[] = [
-        { id: 0, text: '1. Hit the gym', done: false },
-        { id: 1, text: '2. Pay bills', done: false },
-        { id: 2, text: '3. Meet George', done: false },
-        { id: 3, text: '4. Buy eggs', done: false },
-        { id: 4, text: '5. Make your own Angular', done: true }
-    ];
+    @State tasks: TodoTaskData[] = [];
     @State textValue = '';
     @State filterValue = 'asc';
+    @State notLoading = true; 
 
     filterOptions: IOption[] = [
         { name: 'ASC', value: 'asc' },
@@ -54,8 +60,17 @@ export class TodoList implements WbInit {
 
     currentId = 5;
 
+    constructor(private api: TodoApiService) {}
+
     wbInit(): void {
         console.log(this);
+        this.notLoading = false;
+        this.api.getTodoTaskList().then(
+            tasks => this.tasks = tasks
+        )
+        .finally(
+            () => this.notLoading = true
+        )
     }
 
     wbChange(): void {
@@ -85,32 +100,34 @@ export class TodoList implements WbInit {
 
     newElement(): void {
         if (this.textValue) {
-            this.tasks = [
-                ...this.tasks,
-                {
-                    id: this.currentId,
-                    text: `${this.currentId + 1}. ${this.textValue}`,
-                    done: false
+            this.notLoading = false;
+            this.api.addNewTodoTask(this.textValue).then(
+                tasks => this.tasks = tasks
+            ).finally(
+                () => {
+                    this.notLoading = true;
+                    this.textValue = '';
                 }
-            ];
-
-            this.currentId++;
-            this.textValue = '';
+            )
         }
     }
 
     removeTask(id: number): void {
-        this.tasks = this.tasks.filter(task => task.id !== id);
+        this.notLoading = false;
+        this.api.removeTodoTask(id).then(
+            tasks => this.tasks = tasks
+        ).finally(
+            () => this.notLoading = true
+        )
     }
 
     changeItemStatus(id: number): void {
         console.log('Clicked on = ' + (id + 1));
-        const taskIndex = this.tasks.findIndex(task => task.id === id);
-        const task = this.tasks[taskIndex];
-        this.tasks = Object.assign(
-            [] as TodoTaskData[],
-            this.tasks,
-            { [taskIndex]:{ ...task, done: !task.done } }
-        );
+        this.notLoading = false;
+        this.api.changeTodoTaskStatus(id).then(
+            tasks => this.tasks = tasks
+        ).finally(
+            () => this.notLoading = true
+        )
     }
 }
