@@ -4,7 +4,7 @@ import { registerDependency } from "../di/di";
 import { createScope, flattenArray, getScopeProp, renderModificator } from "./../modificator";
 import { wbModule } from "./module";
 import { ConstructorClass } from "./types";
-import { compileTemplate, L } from "./compile";
+import { compileTemplate, HookUseCallback } from "./compile";
 import { renderWebBlock } from "./render";
 import { useFilter } from './filter';
 import 'reflect-metadata';
@@ -17,7 +17,7 @@ const g = getScopeProp;
 const uf = useFilter;
 
 type H = typeof renderWebBlock;
-type ManualRenderTemplateFunc = (ctx: unknown, h: H) => VDomNodeChildren;
+type ManualRenderTemplateFunc = (ctx: unknown, h: H, useCallback: HookUseCallback) => VDomNodeChildren;
 
 export function patchForwardRefs(clazz: Injectable): void {
     clazz.ωß_FORWARD_REFS?.forEach(r => clazz.ωß_INJECT[r.index] = r.ref);
@@ -53,11 +53,11 @@ export function WebBlock<TClass extends ConstructorClass>(params: {
 
         if (typeof params.template === 'string') {
             const renderTemplate = compileTemplate(params.template);
-            t.ωß_Template = (ctx: unknown, l: L) => renderTemplate(h, m, s, g, a, l, uf, ctx);
+            t.ωß_Template = (ctx: unknown, l: HookUseCallback) => renderTemplate(h, m, s, g, a, l, uf, ctx);
         } else 
         if (typeof params.template === 'function') {
             const renderTemplate = params.template;
-            t.ωß_Template = (ctx: unknown) => renderTemplate(ctx, h);
+            t.ωß_Template = (ctx: unknown, l: HookUseCallback) => renderTemplate(ctx, h, l);
         } else {
             throw Error('Template type is incompatible');
         }

@@ -7,7 +7,7 @@ import { injectDependency } from './../di/di';
 import { Props, Signals } from '../core/types';
 import { h, VDomNodeChildren } from "./h";
 import { patchObj } from '../core/utils';
-import { L } from '../core/compile';
+import { HookUseCallback } from '../core/compile';
 
 interface WebComponentHooks {
     wbInit?: () => void;
@@ -21,12 +21,12 @@ export type WbComponentType = ConstructorClass & Injectable & {
     ωß_PROP_NAMES: string[];
     ωß_STATE_NAMES: string[];
     ωß_SIGNAL_NAMES: string[];
-    ωß_Template: (s: any, l: L) => VDomNodeChildren;
+    ωß_Template: (s: any, l: HookUseCallback) => VDomNodeChildren;
 };
 
 export class WbComponent<P, S> {
     
-    private ωß_renderTemplate: (s: any, l: L) => VDomNodeChildren;
+    private ωß_renderTemplate: (s: any, l: HookUseCallback) => VDomNodeChildren;
     private ωß_COMPONENT_NAME: string;
     private ωß_PROP_NAMES: string[];
     private ωß_STATE_NAMES: string[];

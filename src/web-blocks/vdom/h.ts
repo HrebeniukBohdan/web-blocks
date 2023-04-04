@@ -186,7 +186,7 @@ export function h(sel: any, b?: any, c?: any): VDomNode {
       text = c.toString();
       children = [text];
     } else 
-    if (c && c.sel) {
+    if (c && c.kind) {
       children = [c];
     }
   } else 
@@ -198,7 +198,7 @@ export function h(sel: any, b?: any, c?: any): VDomNode {
       text = b.toString();
       children = [text];
     } else 
-    if (b && b.sel) {
+    if (b && b.kind) {
       children = [b];
     } else {
       data = b;
