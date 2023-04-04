@@ -36,15 +36,15 @@ import { IOption, TodoTaskData } from '../types';
                     />
                 <%/wb-for%>
             </ul>
-
-            <%wb-unless condition={{$notLoading}} %>
-                <div class="d-flex justify-content-center align-items-center todo-loading">
-                    <div role="status" class="spinner-border text-danger">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            <%/wb-unless%>
         </div>
+        
+        <%wb-unless condition={{$notLoading}} %>
+            <div class="d-flex justify-content-center align-items-center todo-loading">
+                <div role="status" class="spinner-border text-danger">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        <%/wb-unless%>
     `
 })
 export class TodoList implements WbInit {
@@ -58,18 +58,14 @@ export class TodoList implements WbInit {
         { name: 'DESC', value: 'desc' },
     ];
 
-    currentId = 5;
-
     constructor(private api: TodoApiService) {}
 
     wbInit(): void {
         console.log(this);
-        this.notLoading = false;
-        this.api.getTodoTaskList().then(
-            tasks => this.tasks = tasks
-        )
-        .finally(
-            () => this.notLoading = true
+        this.invoke(
+            this.api.getTodoTaskList().then(
+                tasks => this.tasks = tasks
+            )
         )
     }
 
@@ -100,34 +96,39 @@ export class TodoList implements WbInit {
 
     newElement(): void {
         if (this.textValue) {
-            this.notLoading = false;
-            this.api.addNewTodoTask(this.textValue).then(
-                tasks => this.tasks = tasks
-            ).finally(
-                () => {
-                    this.notLoading = true;
-                    this.textValue = '';
-                }
+            this.invoke(
+                this.api.addNewTodoTask(this.textValue).then(
+                    tasks => {
+                        this.tasks = tasks;
+                        this.textValue = '';
+                    }
+                )
             )
         }
     }
 
     removeTask(id: number): void {
-        this.notLoading = false;
-        this.api.removeTodoTask(id).then(
-            tasks => this.tasks = tasks
-        ).finally(
-            () => this.notLoading = true
-        )
+        this.invoke(
+            this.api.removeTodoTask(id).then(
+                tasks => this.tasks = tasks
+            )
+        );
     }
 
     changeItemStatus(id: number): void {
         console.log('Clicked on = ' + (id + 1));
+
+        this.invoke(
+            this.api.changeTodoTaskStatus(id).then(
+                tasks => this.tasks = tasks
+            )
+        );
+    }
+
+    private invoke(promise: Promise<unknown>): void {
         this.notLoading = false;
-        this.api.changeTodoTaskStatus(id).then(
-            tasks => this.tasks = tasks
-        ).finally(
+        promise.finally(
             () => this.notLoading = true
-        )
+        );
     }
 }

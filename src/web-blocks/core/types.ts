@@ -1,7 +1,7 @@
 import { VDomNodeChildren } from './../vdom/h';
 import { WbComponent } from './../vdom/component';
 import { SignalType } from './decorator';
-import { ForwardedType } from "../di";
+import { ForwardedType } from '../di';
 
 export interface KeyValueMap {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

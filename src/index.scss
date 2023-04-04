@@ -172,12 +172,14 @@ input {
 
 .todo-body {
   position: relative;
+  height: calc(100vh - 209px);
+  overflow-y: auto;
 }
 
 .todo-loading {
   background-color: rgba(0, 0, 0, 0.1);
   top: 0;
   position: absolute;
-  min-height: calc(100vh - 206px);
+  min-height: 100vh;
   width: 100%;
 }

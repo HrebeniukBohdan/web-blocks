@@ -46,15 +46,6 @@ export class ModificatorNode implements NodeContainerWithAttributes, ScopedEleme
         return `${this._children[0].exec()};`;
     }
 
-    /*
-    private evalChildren() {
-        const childrenStr = this._children.length ? 'f([\n' + this._children
-        .map(node => this.spaces(1) + node.exec() as string)
-        .join(',\n') + '\n' + this.spaces(1) + ']);\n' + this.spaces() : '';
-
-        return childrenStr;
-    }*/
-
     private evalAttrs() {
         return Object
                 .keys(this._attrs)

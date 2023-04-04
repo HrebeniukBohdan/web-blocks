@@ -149,7 +149,6 @@ export function State(target: any, propertyKey: string): void {
         this[`ωß_${propertyKey}`] = newVal;
         const updateStateHook: () => void = this[`ωß_$$updateState$$`];
         updateStateHook && updateStateHook();
-        //markStateChanged();
     };
 
     if (delete target[propertyKey]) {

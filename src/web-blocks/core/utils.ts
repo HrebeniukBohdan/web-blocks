@@ -1,5 +1,5 @@
-import { KeyValueMap } from "./types";
-import { VNode } from "snabbdom/build";
+import { VDomNode } from './../vdom/virtual_dom';
+import { KeyValueMap } from './types';
 
 /** returns true if objects are equal **/
 export function isChanged(obj1: KeyValueMap, obj2: KeyValueMap, compPropNames: string[]): boolean {
@@ -23,6 +23,6 @@ export function patchObj(src: KeyValueMap, dest: KeyValueMap, compPropNames: str
 }
 
 /** if modificator alternative util for manual rendering **/
-export function wbIf(cond: boolean, node: VNode): VNode|null {
+export function wbIf(cond: boolean, node: VDomNode): VDomNode|null {
     return cond ? node : null;
 }

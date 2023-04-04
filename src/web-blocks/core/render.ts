@@ -1,8 +1,16 @@
-import { VDOMAttributes, VDomNode } from '../vdom/virtual_dom';
-import { Signals } from './types';
+import { VDomNode } from '../vdom/virtual_dom';
 import { wbModule } from './module';
-import { Attrs, On} from 'snabbdom/build';
 import { c, h, VDomNodeChildren } from '../vdom/h';
+
+type Attrs = Record<string, string | number | boolean>;
+type Listener<T> = (this: VDomNode, ev: T, vnode: VDomNode) => void;
+type On = {
+  [N in keyof HTMLElementEventMap]?:
+    | Listener<HTMLElementEventMap[N]>
+    | Array<Listener<HTMLElementEventMap[N]>>;
+} & {
+  [event: string]: Listener<any> | Array<Listener<any>>;
+};
 
 export function renderWebBlock(sel: string, props?: Attrs | null, eventBindings?: On | null, children?: VDomNodeChildren): VDomNode {
     if (sel.includes('wb-')) {

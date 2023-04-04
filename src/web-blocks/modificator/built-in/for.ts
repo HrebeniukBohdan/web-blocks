@@ -28,8 +28,6 @@ export class WbForModificator implements IModificator {
         const indName = currentIndexName || CURRENT_INDEX_NAME;
         const result: VDomNodeChildren = [];
         let currentRenderedElem: VDomNode;
-        console.log('Render list wbFor');
-        console.log(iterList);
 
         scope[indName] = 0;
 

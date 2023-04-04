@@ -56,20 +56,73 @@ export const tokenTypeList: TokenType[] = [
     // \s*(>)\s*
     new TokenType('OPEN_TAG_CLOSE_SIGN', '\\s*(>)\\s*'),
 
+    // Colon
+    // Value = None
+    // \s*:
     new TokenType('COLON', '\\s*:'),
+
+    // Event
+    // Value = None
+    // \s*\$\$event
     new TokenType('EVENT', '\\s*\\$\\$event'),
+
+    // Interpolation start
+    // Value = None
+    // {{
     new TokenType('INTERPOLATION_START', '{{'),
+
+    // Interpolation end
+    // Value = None
+    // }}
     new TokenType('INTERPOLATION_END', '}}'),
+
+    // True const
+    // Value = None
+    // \s*true\s*
     new TokenType('TRUE', '\\s*true\\s*'),
+
+    // False const
+    // Value = None
+    // \s*false\s*
     new TokenType('FALSE', '\\s*false\\s*'),
+
+    // Left parenthesis
+    // Value = None
+    // \s*\(
     new TokenType('PAREN_L', '\\s*\\('),
+
+    // Right parenthesis
+    // Value = None
+    // \s*\)\s*
     new TokenType('PAREN_R', '\\s*\\)\\s*'),
+
+    // Comma const
+    // Value = None
+    // \s*,\s*
     new TokenType('COMMA', '\\s*,\\s*'),
+
+    // Object path indentifier
+    // Value = Object path
+    // \s*\$([a-zA-Z][a-zA-Z0-9\_]*(?:\.[a-zA-Z][a-zA-Z0-9\_]*)+)
     new TokenType('OBJECT_PATH_ID', '\\s*\\$([a-zA-Z][a-zA-Z0-9\\_]*(?:\\.[a-zA-Z][a-zA-Z0-9\\_]*)+)'),
+
+    // FILTER_ID
+    // Value = Filter Name Identifier
+    // \s*\|\s*([a-zA-Z][a-zA-Z0-9\_]*)
     new TokenType('FILTER_ID', '\\s*\\|\\s*([a-zA-Z][a-zA-Z0-9\\_]*)'),
+
+    // ID
+    // Value = Identifier Name
+    // \s*\$([a-zA-Z][a-zA-Z0-9\_]*)
     new TokenType('ID', '\\s*\\$([a-zA-Z][a-zA-Z0-9\\_]*)'),
+
+    // Number const
+    // Value = Number value
+    // \s*([\d]*\.[\d]+)
+    // \s*([\d]+)
     new TokenType('NUMBER', '\\s*([\\d]*\\.[\\d]+)'),
     new TokenType('NUMBER', '\\s*([\\d]+)'),
+
     // String Literal Double-quoted
     // Value = String Value
     // "([^"]*)"|'([^']*)'

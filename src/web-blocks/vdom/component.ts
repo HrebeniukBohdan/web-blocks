@@ -88,16 +88,13 @@ export class WbComponent<P, S> {
             throw new Error("You are setting the props of an inmounted component")
         }
 
-        // this.state = this.componentWillRecieveProps(props, this.state)
         this.updateSignals(props as any);
-        // add update props
         this.updateProps(props);
         return this.getUpdateDiff()
     }
     
     public initProps(props: P): VDomNode {
         this.updateSignals(props as any);
-        // add update props
         this.updateProps(props);
         this.currentRootNode = this.render()
         return this.currentRootNode
@@ -129,7 +126,6 @@ export class WbComponent<P, S> {
     
     // hooks call
     public componentDidInit() {
-        // this.ωß.wbChange && this.ωß.wbChange();
         this.ωß.wbInit && this.ωß.wbInit();
     }
 
