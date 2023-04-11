@@ -1,6 +1,6 @@
-import { Service } from "../web-blocks/core";
-import { Inject, forwardRef } from "../web-blocks/di";
-import { DataService } from "./serv1";
+import { Service } from "../../web-blocks/core";
+import { Inject, forwardRef } from "../../web-blocks/di";
+import { DataService } from "./service";
 
 @Service()
 export class HTTPService {

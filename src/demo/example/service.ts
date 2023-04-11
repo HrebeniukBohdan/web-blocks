@@ -1,4 +1,4 @@
-import { Service } from "../web-blocks/core";
+import { Service } from "../../web-blocks/core";
 
 @Service()
 export class DataService {

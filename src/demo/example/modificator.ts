@@ -1,7 +1,7 @@
-import { VDomNode } from './../web-blocks/vdom/virtual_dom';
-import { IModificator } from './../web-blocks/modificator/types';
+import { VDomNode } from '../../web-blocks/vdom/virtual_dom';
+import { IModificator } from '../../web-blocks/modificator/types';
 import { HTTPService } from './services';
-import { Modificator } from './../web-blocks/modificator/decorator';
+import { Modificator } from '../../web-blocks/modificator/decorator';
 
 interface WbNothingProps {
     some: boolean;

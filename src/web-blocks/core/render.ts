@@ -2,7 +2,7 @@ import { VDomNode } from '../vdom/virtual_dom';
 import { wbModule } from './module';
 import { c, h, VDomNodeChildren } from '../vdom/h';
 
-type Attrs = Record<string, string | number | boolean>;
+type Attrs = Record<string, any>;
 type Listener<T> = (this: VDomNode, ev: T, vnode: VDomNode) => void;
 type On = {
   [N in keyof HTMLElementEventMap]?:

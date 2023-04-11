@@ -1,7 +1,7 @@
-import { WbNothingModificator } from './mod';
-import { WbModule } from "../web-blocks/core";
-import { ModComponent, RootComponent } from "./Component";
-import { DataService } from "./serv1";
+import { WbNothingModificator } from './modificator';
+import { WbModule } from "../../web-blocks/core";
+import { ModComponent, RootComponent } from "./component";
+import { DataService } from "./service";
 import { HTTPService, NewService } from "./services";
 
 @WbModule({
@@ -18,4 +18,4 @@ import { HTTPService, NewService } from "./services";
         HTTPService
     ],
 })
-export class AppModule {}
+export class ExampleModule {}

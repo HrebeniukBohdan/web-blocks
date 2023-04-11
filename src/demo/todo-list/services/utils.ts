@@ -3,7 +3,7 @@ import { Service } from "../../../web-blocks/core";
 @Service()
 export class UtilService {
 
-    private readonly DELAY_TIMEOUT = 250;
+    private readonly DELAY_TIMEOUT = 200;
 
     delay(): Promise<void> {
       return new Promise((resolve) => {
